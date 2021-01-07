@@ -48,6 +48,28 @@ W3C标准包括：
 </html>
 ```
 
+## 页面结构
+
+
+
+```html
+<header>网页头部</header>
+<footer>网页脚部</footer>
+<nav>网页导航栏</nav>
+
+```
+
+| 元素名  |              描述              |
+| :-----: | :----------------------------: |
+| *header |        标记头部区域内容        |
+| *footer |        标记脚部区域内容        |
+| section |    Web页面中的一块独立区域     |
+| article |         独立的文章内容         |
+|  aside  | 相关内容或应用（常用于侧边栏） |
+|  *nav   |         导航类辅助内容         |
+
+
+
 ## 网页基本标签
 
 ```html
@@ -231,4 +253,40 @@ url中的#xxx就代表锚链接
     </tr>
 </table>
 ```
+
+## 视频和音频
+
+```html
+<!--
+1.controls:播放控制组件
+2.autoplay:自动播放
+-->
+<video src="path" controls autoplay></video>
+
+<audio src="path" controls autoplay></audio>
+```
+
+## iframe内联框架
+
+```html
+<!--在网页中嵌入引用页面
+1.url：引用的页面地址
+2.name：框架标识名
+3.frameborder：frame边框
+-->
+<iframe src="url" name="frameName" frameborder="0">
+    
+</iframe>
+```
+
+```html
+<!--内联框架内容为空-->
+<iframe src="" name="hello" frameborder="0" width="100px" height="100px"></iframe>
+<!--点击跳转，百度页面会在hello的iframe框架中显示-->
+<a href="http://www.baidu.com" target="#hello">点击跳转</a>
+```
+
+
+
+
 
