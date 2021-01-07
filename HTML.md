@@ -214,7 +214,20 @@ url中的#xxx就代表锚链接
 <table border="1px">
     <tr>
     	<!--跨列-->
-        <td colspan="3">第一行合并三列</td>
+        <td colspan="3" style="text-align: center">第一行合并三列</td>
+    </tr>
+    
+    <tr>
+    	<!--跨行-->
+        <td rowspan="2">两行一列</td>
+        <td>2-1</td>
+        <td>2-2</td>
+    </tr>
+    
+	<tr>
+        <!--因为上一行跨行-->
+    	<td>3-1</td>
+        <td>3-2</td>
     </tr>
 </table>
 ```
