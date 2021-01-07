@@ -274,9 +274,13 @@ url中的#xxx就代表锚链接
 2.name：框架标识名
 3.frameborder：frame边框
 -->
-<iframe src="url" name="frameName" frameborder="0">
+<iframe src="url" name="frameName" frameborder="no">
     
 </iframe>
+
+<iframe src="//player.bilibili.com/player.html?aid=55631961&bvid=BV1x4411V75C&cid=97258171&page=13" 
+        scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
+</body>
 ```
 
 ```html
@@ -284,6 +288,163 @@ url中的#xxx就代表锚链接
 <iframe src="" name="hello" frameborder="0" width="100px" height="100px"></iframe>
 <!--点击跳转，百度页面会在hello的iframe框架中显示-->
 <a href="http://www.baidu.com" target="#hello">点击跳转</a>
+```
+
+## 表单
+
+- method：发送表单数据的方法
+- action：向何处发送表单数据，并会跳转到该页面
+- input：表单的组件基本上都是由input构成
+  - type
+    - text：文本，缺省属性
+    - submit：提交本form表单的[name:value]的键值对内容，没有name的组件不提交
+    - reset：重置
+    - checkbox：多选框
+    - radio：单选框
+    - file：文件
+    - hidden：隐藏
+    - button：按钮
+    - image：src=“path"，点击效果等同于submit
+
+表单元素格式
+
+|   属性    |                             说明                             |
+| :-------: | :----------------------------------------------------------: |
+|   type    |                        指定元素的类型                        |
+|   name    |             指定表单元素名称，与提交数据内容绑定             |
+|   value   |          元素初始值，radio、checkbox必须指定一个值           |
+|   size    | 指定表单元素初始宽度<br/>text和password类型大小以字符为单位<br />其他类型宽度以像素为单位 |
+| maxlength |              text和password类型输入的最大字符数              |
+|  checked  |            radio或checkout时，指定按钮是否被选中             |
+
+
+
+```html
+<form method="post" action="result.html">
+    <p>
+        名字：<input name="name" type="text">
+    </p>
+    <p>
+        密码：<input name="pass" type="password">
+    </p>
+    <p>
+        <input type="submit" name="Submit" value="提交">
+    	<input type="reset" name="Reset" value="重填">
+    </p>
+</form>
+```
+
+## 单选框
+
+> 单选框以组为单位，name属性相同的radio组件为一组。同组的单选框只能选择一个。
+
+```html
+<p>
+    性别：
+    <input type="radio" value="man" name="sex">man
+    <input type="radio" value="woman" name="sex">woman
+</p>
+```
+
+## 多选框
+
+> 没有组的概念，name属性可以不同
+
+```html
+<p>
+    <input type="checkbox" value="sleep" name="hobby">睡觉
+    <input type="checkbox" value="code" name="hobby">编程
+    <input type="checkbox" value="game" name="hobby">游戏
+</p>
+
+<!--
+hobby=sleep&hobby=code&hobby=game
+-->
+```
+
+## 文件域
+
+```html
+<p>
+    <input type="file" name="files">
+</p>
+```
+
+
+
+## 下拉框
+
+```html
+<p>
+    国家：
+    <select name="Select">
+        <option value="1">中国</option>
+        <option value="2">美国</option>
+        <option value="3">南非</option>
+        <option value="4" selected>挪威</option>
+    </select>
+</p>
+```
+
+## 文本域
+
+```html
+<p>
+    评论：
+    <textarea name="TextArea" cols="50" rows="10">[Text]</textarea>
+</p>
+```
+
+## 滑块
+
+```html
+<p>
+	音量：
+    <input type="range" name="voice" min="0" max="100" step="10">
+</p>
+```
+
+## 搜索框
+
+```html
+<p>
+    搜索：
+    <input type="search" name="search">
+</p>
+```
+
+
+
+## 表单的应用
+
+- label
+- hidden：一般用于传递默认数据
+- readonly
+- disabled：组件变黑，不可用。Submit也不会提交其中数据
+
+> label标签可以通过for属性指定id组件，当点击Text时光标会自动锁定id组件，相当于直接点击id组件
+
+```html
+<p>
+    <label for="mark">Text</label>
+    <input type="text" id="mark">
+</p>
+```
+
+
+
+## 表单初级验证
+
+> 前端数据验证，减轻服务器负担&提高安全性
+
+- placeholder：提示默认信息
+- required：非空判断，必要填值
+- pattern：正则表达式
+
+```html
+<input type="email" name="email">
+<input type="url" name="url">
+<input type="number" name="number" max="100" min="10" step="1">
 ```
 
 
