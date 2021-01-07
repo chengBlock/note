@@ -145,3 +145,77 @@ url中的#xxx就代表锚链接
   - 内容撑开宽度，左右都是行内元素可以在一行内显示
   - a、strong、em
 
+## 列表
+
+```html
+<!--无序列表：ul-->
+<ul>
+    <li></li>
+    <li></li>
+</ul>
+
+<!--有序列表:dl-->
+<ol>
+    <li></li>
+    <li></li>
+</ol>
+
+<!--自定义列表-->
+<dl>
+    <dt>列表名1</dt>
+    	<dd></dd>
+    	<dd></dd>
+    <dt>列表名2</dt>
+    	<dd></dd>
+    	<dd></dd>
+</dl>
+```
+
+## 表格
+
+基本结构：
+
+- tr：行
+- td：列
+
+属性：
+
+- colspan：跨列
+- rowspan：跨行
+
+单词意思：
+
+- column：列
+- row：行
+- span：跨距
+
+```html
+<!--table:表格标签
+	border：表格线属性
+-->
+<table border="1px">
+    <tr>
+    	<td>1-1</td>
+        <td>1-2</td>
+        <td>1-3</td>
+    </tr>
+    <tr>
+    	<td>2-1</td>
+        <td>2-2</td>
+        <td>2-3</td>
+    </tr>
+    <tr>
+    	<td>3-1</td>
+        <td>3-2</td>
+        <td>3-3</td>
+    </tr>
+</table>
+
+<table border="1px">
+    <tr>
+    	<!--跨列-->
+        <td colspan="3">第一行合并三列</td>
+    </tr>
+</table>
+```
+
