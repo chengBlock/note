@@ -110,6 +110,40 @@ CSS:表现(美化网页)
 
 ## 层次选择器
 
+1. 后代选择器
+
+   ```html
+   body p{
+   	background:red;
+   }
+   ```
+
+2. 子选择器
+
+   ```html
+   body>p{
+   	background:red;
+   }
+   ```
+
+3. 相邻兄弟选择器(不包含自己,向下选择)
+
+   ```html
+   .active + p{
+   	background:red;
+   }
+   ```
+
+4. 通用选择器(包括自己,后面的所有兄弟)
+
+   ```html
+   .active~p{
+   	background:red;
+   }
+   ```
+
+## 伪类选择器
+
 
 
 
