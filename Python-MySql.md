@@ -21,34 +21,6 @@
 
 ![image-20210110200427947](C:\Users\clcheng\AppData\Roaming\Typora\typora-user-images\image-20210110200427947.png)
 
-# SQL
-
-> SQL是一门特殊的语言,用于操作关系型数据库.<u>不区分大小写</u>
-
-```python
-# 创建Connection连接
-conn = connect(host='localhost',port=3306,user='root',password='cheng123456',database='python1',charset='utf8')
-
-# 得Cursor对象
-cs = conn.cursor()
-
-# 更新语句
-# sql = 'update students set name="刘邦" where id =6'
-
-# 删除语句
-# sql = 'delete from students where id=6'
-
-# select语句
-sql = 'select id,name form students where id=7'
-
-# 执行select语句,返回受影响的行数
-count = cs.execute(sql)
-
-# 打印受影响的行数
-print(count)
-                 
-```
-
 ## Navicat
 
 ![image-20210110205219115](C:\Users\clcheng\AppData\Roaming\Typora\typora-user-images\image-20210110205219115.png)
@@ -98,4 +70,43 @@ print(count)
   - 不存在，则填写失败并抛出异常
 
     > 虽然外键约束可以保证数据有效性，但进行crud时，会降低数据库性能，所以不推荐使用。一般通过在逻辑层进行控制
+
+# SQL
+
+> SQL是一门特殊的语言,用于操作关系型数据库.<u>不区分大小写</u>
+
+```python
+# 创建Connection连接
+conn = connect(host='localhost',port=3306,user='root',password='cheng123456',database='python1',charset='utf8')
+
+# 得Cursor对象
+cs = conn.cursor()
+
+# 更新语句
+# sql = 'update students set name="刘邦" where id =6'
+
+# 删除语句
+# sql = 'delete from students where id=6'
+
+# select语句
+sql = 'select id,name form students where id=7'
+
+# 执行select语句,返回受影响的行数
+count = cs.execute(sql)
+
+# 打印受影响的行数
+print(count)
+                 
+```
+
+```sql
+--显示创建数据库类型(字符集)
+mysql> show create database python4;
++----------+-----------------------------------------------------------------------------------------------------+
+| Database | Create Database                                                                                     |
++----------+-----------------------------------------------------------------------------------------------------+
+| python4  | CREATE DATABASE `python4` /*!40100 DEFAULT CHARACTER SET utf8 */ /*!80016 DEFAULT ENCRYPTION='N' */ |
++----------+-----------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+```
 
