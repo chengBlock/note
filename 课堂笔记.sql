@@ -44,7 +44,57 @@ show tables;
     --primary key表示主键
     --default默认值
     --create table 表名 (字段 类型 约束[,字段 类型 约束]);
-create table student (id int auto_increment,name varchar(10) not null,age tiny);
+create table student(id int,name varchar(8),age int);
+
+create table people(id int primary key not null auto_increment,name varchar(30));
+
+create table teacher(id int primary key not null,name varchar(10) not null);
+
+create table school(
+    id int unsigned primary key not null auto_increment,
+    name varchar(30) not null,
+    address varchar(30),
+    type varchar(10)
+);
+
+create table students(
+    id int unsigned not null auto_increment primary key,
+    name varchar(30),
+    age tinyint unsigned default 0,
+    high decimal(5,2),
+    gender enum("男","女","其它","保密") default "保密",
+    cls_id int unsigned
+);
+
+
+
+--查看表信息
+desc 表名;
+
+--插入表项
+insert into students values(1,"Alice",19,171.1,"女",5);
+
+--查询数据
+select * from students;
+
+
+-------------------------**crud**--------------------
+--修改表-添加字段
+alter table 表名 add 字段 类型 约束;
+
+--修改表-修改字段
+alter table 表名 modify 字段 类型 约束;
+
+--修改表-修改字段:重命名
+alter table 表名 change 原字段 新字段 类型 约束;
+
+--修改表-删除字段
+alter table 表名 drop 字段;
+
+
+--删除表
+drop table 表名;
+
 
 
 
