@@ -2,6 +2,28 @@
 
 - alter : 改变、修改
 - modify : 修饰,调整
+- fetch : 拿来
+
+# python命令
+
+- pip install --upgrade pip : 升级pip
+
+- pip -v list : 查看已安装package
+
+- pip -V : 查看当前版本
+
+- 
+
+- 格式化输出 : 占位符
+
+  ```python
+  print("Hello%s,you are %d years old!" % (name,age))
+  #name将替换%s的位置，b将替换%d的位置，字符串后的%用来说明是哪些变量要替换前面的占位符，当只有一个变量的时候，可以省略括号
+  ```
+
+  
+
+  
 
 # MySql基本使用
 
@@ -113,5 +135,125 @@ mysql> show create database python4;
 | python4  | CREATE DATABASE `python4` /*!40100 DEFAULT CHARACTER SET utf8 */ /*!80016 DEFAULT ENCRYPTION='N' */ |
 +----------+-----------------------------------------------------------------------------------------------------+
 1 row in set (0.00 sec)
+```
+
+# 准备数据
+
+## 创建数据表
+
+```sql
+create database JD charset=utf8;
+
+use JD;
+
+create table goods(
+	id int unsigned primary key not null auto_increment,
+    name varchar(150) not null,
+    cate_name varchar(40) not null,
+    brand_name varchar(40) not null,
+    price decimal(10,3) not null default 0,
+    is_show bit not null default 1,
+    is_saleoff bit not null default 0
+);
+```
+
+# Python操作Mysql
+
+![image-20210111103512147](C:\Users\clcheng\AppData\Roaming\Typora\typora-user-images\image-20210111103512147.png)
+
+游标:
+
+> 游标是系统为用户开设的一个数据缓冲区,存放SQL语句的执行结果.
+
+在数据库中，游标是一个十分重要的概念。游标提供了一种对从表中检索出的数据进行操作的灵活手段，就本质而言，游标实际上是一种能从包括多条数据记录的结果集中每次提取一条记录的机制。游标总是与一条SQL 选择语句相关联因为游标由结果集（可以是零条、一条或由相关的选择语句检索出的多条记录）和结果集中指向特定记录的游标位置组成。当决定对结果集进行处理时，必须声明一个指向该结果集的游标。如果曾经用 C 语言写过对文件进行处理的程序，那么游标就像您打开文件所得到的文件句柄一样，只要文件打开成功，该文件句柄就可代表该文件。对于游标而言，其道理是相同的。可见游标能够实现按与传统程序读取平面文件类似的方式处理来自基础表的结果集，从而把表中数据以平面文件的形式呈现给程序。
+
+**引入模块**
+
+- 在py文件中引入pymysql模块
+
+```python
+from pymysql import *
+```
+
+**Connection对象**
+
+- 用于建立与数据库的连接
+- 创建对象 : 调用connect()方法
+
+```python
+conn = connect(参数列表)
+```
+
+- 参数列表 : 
+  - host :
+  - port : 
+  - database : 
+  - user : 
+  - password : 
+  - charset : utf8
+- 对象的方法 : 
+  - close() : 关闭连接
+  - commit() : 提交
+  - cursor() ; 返回Cursor对象,用于执行sql语句并获得结果
+
+
+
+**Cursor对象**
+
+- 用于执行sql语句,使用频率最高的语句为select、insert、update、delete
+- 获取Cursor对象 
+- 遍历结果集
+
+```python
+cs1 = conn.cursor()
+```
+
+- 对象方法：
+  - close()
+  - execute(operation [,parameters])执行语句,返回受影响的行数
+  - fetchone() : 执行查询语句时,获取查询结果集的第一行数据,返回一个元组,<u>同时游标指向下一条数据</u>
+  - fetchall() : 执行查询语句时,获取结果集的所有行,一行构成一个元组,再将这些元组装入一个元组返回
+  - fetmany() : 指定返回的数据数,并放在一个元组中
+-  对象属性
+  - rowcount : 只读属性,表示最近一次execute()执行后受影响的行数
+  - connection : 获得当前连接对象
+
+**查询一行数据**
+
+```python
+from pymysql import * 
+
+def main():
+    # 创建Connection连接
+    conn = connect(host="localhost",port=3306,user="root",password="cheng123456",database="jd",charset="utf8")
+    
+    # 获得Cursor对象
+    cursor = conn.cursor()
+    
+	"""执行代码的逻辑功能是用户自己设定的其他的都是固定模式"""
+    
+    # 执行查询语句,并返回受影响的行数:查询一行数据
+    count = cursor.execute('select id,name from goods where id>=4')
+    
+    # 打印受影响的行数
+    print("查询到%d条数据" % count)
+    
+    for i in range(count):
+        # 获取查询的结果
+        result = cursor.fetchone()
+        # 打印查询的结果(元组形式)
+        print(result)
+        
+        
+    # 关闭连接
+    cursor.close()
+    conn.close()
+    
+"""
+__name__ 是当前模块名，当模块被直接运行时模块名为 __main__ 。这句话的意思就是，当模块被直接运行时，以下代码块将被运行，当模块是被导入时，代码块不被运行。
+
+"""
+if _name_ == '_main__':
+    main()
 ```
 
