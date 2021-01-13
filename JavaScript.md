@@ -1,3 +1,13 @@
+# CDN
+
+字节跳动jquery-mini-3.3.1
+
+> <script src="https://s3.pstatp.com/cdn/expire-1-M/jquery/3.3.1/jquery.min.js"></script>
+
+echarts-mini-4.9.0
+
+> <script crossorigin="anonymous" integrity="sha512-q0nIjE1LHEOioBDYuyhml+xxTm+ftiPuzdWgEgwq5g3YAZ5CWDmjDUs4t7pFeWnvFQe7eLQg/+PepPbacIDtkA==" src="http://lib.baomitu.com/echarts/4.9.0-rc.1/echarts.min.js"></script>
+
 # jQuery
 
 > jQuery库，里面存在大量的JavaScript函数
