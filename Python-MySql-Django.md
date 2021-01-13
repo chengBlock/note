@@ -599,3 +599,312 @@ class JsonResponse(data,encoder=DjangoJSONEncoder,safe=True,json_dumps_params=No
 
 - data : 应该是一个字典类型
 - safe：False时，data可以为任何能够被转换为JSON格式的对象，默认为True，不是字典类型会抛出TypeError的异常
+
+### 静态文件配置
+
+> js、css、img等都叫做静态文件
+
+django静态文件的配置，需要在settings配置文件中写上：
+
+```python
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.1/howto/static-files/
+
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS=(
+    os.path.join(os.path.dirname(__file__),"..",'static').replace('\\','/'),
+    os.path.join('static'),
+)
+```
+
+![image-20210113192116599](C:\Users\cheng\AppData\Roaming\Typora\typora-user-images\image-20210113192116599.png)
+
+直接使用项目的相对路径会暴露服务器的文件结构，所以Django对此做了静态文件的保护：
+
+```python
+STATIC_URL = '/static/' #静态文件的别名，叫什么都行，代指静态文件夹
+
+# 指定静态文件夹的真实路径
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR,'statics') #statics为真实文件夹
+]
+
+"""后面的HTML中引入静态资源使用 /static/... 即可"""
+```
+
+**静态文件可以直接通过url访问**
+
+![image-20210113195042342](C:\Users\cheng\AppData\Roaming\Typora\typora-user-images\image-20210113195042342.png)
+
+### 手动配置App
+
+pycharm配置App会自动在setting.py中添加 ‘app01.apps.App01Config'
+
+```python
+# Application definition
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'app01.apps.App01Config',
+]
+```
+
+```python
+INSTALLED_APPS = [
+    'app01.apps.App01config', #全称
+    'app02',	#简写
+]
+```
+
+
+
+### ORM
+
+> Object Relational Mapping（对象关系映射），通过python代码实现对数据的操作
+
+类对象->sql->pymysql->mysql服务器->磁盘，orm其实就是将类对象的语法翻译成sql语句的一个引擎。
+
+**牺牲了部分性能**
+
+https://cnblogs.com/clschao/articles/10427807.html![img](https://images2018.cnblogs.com/blog/877318/201804/877318-20180425153356710-1116321211.png)
+
+  #### 生成表
+
+> 在models.py中编写表类
+
+```python
+'''
+create table book(
+    id int primary key auto_increment not null,
+    title varchar(64),
+    state boolean not null ,
+    pub_date date not null,
+    price decimal(20,5) not null ,
+    publish varchar(32) not null
+)
+'''
+#继承Model类
+class Book(models.Model):
+
+    #orm生成的字段都默认为not null
+    #models的子类AutoField在这里作为Book的一个字段
+    # 自增、主键
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=64)
+    state = models.BooleanField()
+    pub_date = models.DateField()
+    price = models.DecimalField(max_digits=20,decimal_places=5)
+    publish = models.CharField(max_length=32)
+```
+
+> 执行命令
+
+```bash
+#将models.py中的语句记录到migrations下的py文件中
+python manage.py makemigrations
+
+#在db.sqlite3中执行orm语句
+python manage.py migrate
+```
+
+```python
+D:\WorkSpace\Python\Django\JQuery_Django>python manage.py makemigrations
+Migrations for 'app01':
+  app01\migrations\0001_initial.py
+    - Create model Book
+
+D:\WorkSpace\Python\Django\JQuery_Django>python manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, app01, auth, contenttypes, sessions
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying app01.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying sessions.0001_initial... OK
+```
+
+> 生成数据表
+
+![image-20210113214138072](C:\Users\cheng\AppData\Roaming\Typora\typora-user-images\image-20210113214138072.png)
+
+#### 执行数据库同步指令的问题
+
+- 因为django的orm语句都是默认not null 的字段值，当新增字段时要指定默认值，保证已存在的表项不会存在新增字段的空值的情况
+
+### 指定Mysql数据库
+
+> 默认情况
+
+setting.py
+
+```python
+# Database
+# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
+
+DATABASES = {
+    'default': {
+        #等价于：External Livraries-> site-packages->django->db->backends->sqlite3
+        'ENGINE': 'django.db.backends.sqlite3', #使用sqlite3
+        'NAME': BASE_DIR / 'db.sqlite3',	#在根目录下，生成名为db.sqlite3的数据库
+    }
+}
+```
+
+![image-20210113221338014](C:\Users\cheng\AppData\Roaming\Typora\typora-user-images\image-20210113221338014.png)
+
+
+
+> 改为mysql
+
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql', #使用db下的mysql
+        'NAME': 'orm01', #库名
+        'HOST':'www.clcheng.top',
+        'PORT':3306,
+        'USER':'root',
+        'PASSWORD':'666',
+    }
+}
+```
+
+#### 配置连接mysql数据库
+
+1. 去mysql里面创建一个库
+
+   ```sql
+   create database orm01 charset=utf8mb4; #涵盖生僻字
+   ```
+
+2. 将setting.py配置文件中的DATABASES
+
+   ```python
+   DATABASES = {
+       'default': {
+           'ENGINE': 'django.db.backends.mysql', #使用db下的mysql
+           'NAME': 'orm01', #库名
+           'HOST':'www.clcheng.top',
+           'PORT':3306,
+           'USER':'root',
+           'PASSWORD':'cheng123456',
+       }
+   }
+   # 一个数据库连接所需要的完整的信息
+   # mysql -hwww.clcheng.top -P3306 -uroot -pcheng123456
+   ```
+
+   python连接mysql需要pymysql，django需要mysqlclient or MySQL-python(版本原因，必须使用pymysql0)
+
+3. 指定django连接mysql的python模块（将pymysql设置为django连接Mysql的模块）
+
+   ```python
+   1.安装pymysql
+   2.项目文件的__init__.py添加以下内容
+   	import pymysql
+       pymysql.install_as_MySQLdb()
+   ```
+
+4. 执行数据库migrate指令
+
+   ```bash
+   python manage.py migrations
+   python manage.py migrate
+   ```
+
+   
+
+5. 可以通过pycharm database图形界面连接到mysql
+
+### migrate数据库同步指令执行过程
+
+![image-20210113225213004](C:\Users\cheng\AppData\Roaming\Typora\typora-user-images\image-20210113225213004.png)
+
+1. makemigration生成记录文件
+2. migrate执行记录文件，翻译成sql，并到配置的数据库中生成表
+3. migrate执行完之后，django会将执行过的migration文件记录到django_migrations表中做一个执行记录，记录哪些migrations文件已经被执行过了，被执行过了的就不再执行，以防出现migrations文件被重复执行的情况
+
+### Field属性
+
+```python
+data_types = {
+        'AutoField': 'integer AUTO_INCREMENT',
+        'BigAutoField': 'bigint AUTO_INCREMENT',
+        'BinaryField': 'longblob',
+        'BooleanField': 'bool',
+        'CharField': 'varchar(%(max_length)s)',
+        'DateField': 'date',
+        'DateTimeField': 'datetime(6)',
+        'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
+        'DurationField': 'bigint',
+        'FileField': 'varchar(%(max_length)s)',
+        'FilePathField': 'varchar(%(max_length)s)',
+        'FloatField': 'double precision',
+        'IntegerField': 'integer',
+        'BigIntegerField': 'bigint',
+        'IPAddressField': 'char(15)',
+        'GenericIPAddressField': 'char(39)',
+        'JSONField': 'json',
+        'NullBooleanField': 'bool',
+        'OneToOneField': 'integer',
+        'PositiveBigIntegerField': 'bigint UNSIGNED',
+        'PositiveIntegerField': 'integer UNSIGNED',
+        'PositiveSmallIntegerField': 'smallint UNSIGNED',
+        'SlugField': 'varchar(%(max_length)s)',
+        'SmallAutoField': 'smallint AUTO_INCREMENT',
+        'SmallIntegerField': 'smallint',
+        'TextField': 'longtext',
+        'TimeField': 'time(6)',
+        'UUIDField': 'char(32)',
+    }
+```
+
+```python
+1.default
+ 
+字段的默认值。可以是一个值或者可调用对象。如果可调用 ，每有新对象被创建它都会被调用，如果你的字段没有设置可以为空，那么将来如果我们后添加一个字段，这个字段就要给一个default值
+ 
+2.primary_key
+ 
+如果为True，那么这个字段就是模型的主键。如果你没有指定任何一个字段的primary_key=True，
+Django 就会自动添加一个IntegerField字段做为主键，所以除非你想覆盖默认的主键行为，
+否则没必要设置任何一个字段的primary_key=True。
+ 
+3.unique
+ 
+如果该值设置为 True, 这个数据字段的值在整张表中必须是唯一的
+```
+
+```python
+DatetimeField、DateField、TimeField这个三个时间字段，都可以设置如下属性。
+
+1.auto_now_add
+    配置auto_now_add=True，创建数据记录的时候会把当前时间添加到数据库。
+
+2.auto_now
+    配置上auto_now=True，每次更新数据记录的时候会更新该字段，标识这条记录最后一次的修改时间。
+```
+
+# ORM数据库的增删改查
+
