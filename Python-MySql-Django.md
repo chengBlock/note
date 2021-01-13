@@ -328,14 +328,14 @@ mysites
 --mysites
 	--_init_.py
     --asgi.py
-    --settings.py
-    --urls.py
+    --settings.py #配置
+    --urls.py	  #路由
     --wsgi.py    
 ```
 
 - manage.py——Django项目里面的工具，通过它可以调用django shell和数据库等
 - setting.py——包含项目的默认设置，包括数据库信息，调试标志以及其它的工作变量
-- urls.py——负责把URL模式映射到应用程序
+- urls.py——负责把URL模式映射到应用程序（URL控制器）
 
 3.启动django项目
 
@@ -352,10 +352,60 @@ mysites
 2.项目结构
 
 ```python
-
+mysites
+--manage.py 
+--mysites
+--blog
+	--models.py #跟数据库打交道
+    --views.py	#跟用户打交道
+    --......
 ```
 
+可以看到上述项目缺少Template模块，所以正常项目结构应该为：
 
+```python
+mysites
+--manage.py 
+--mysites
+--templates #模板
+--blog
+```
+
+### CentOS7 安装Python3
+
+> www.clcheng.top开放6000~10000端口、3306、443、80
+
+**软连接：**
+
+```shell
+ln 参数 源文件或目录 目标文件或目录
+
+ln -s log2013.log link2013
+```
+
+- -b 删除，覆盖以前建立的链接
+- -d 允许超级用户制作目录的硬链接
+- -f 强制执行
+- -i 交互模式，文件存在则提示用户是否覆盖
+- -n 把符号链接视为一般目录
+- -s 软链接(符号链接)
+- -v 显示详细的处理过程
+
+**环境变量：**
+
+> Linux export 命令用于设置或显示环境变量
+
+```bash
+export 参数 变量名称=变量设置值
+
+export -p #列出当前的环境变量
+export MYENV //定义环境变量MYENV
+export MYENV="path" //定义环境变量
+```
+
+- -f：代表“变量名称”中为函数名称
+- -n：删除指定的变量。变量实际上并未删除，只是不会输出到后续指令的执行环境中
+- -p：列出所有的shell赋予程序的环境变量
 
 
 
