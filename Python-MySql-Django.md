@@ -155,6 +155,8 @@ print("Hello%s,you are %d years old!" % (name,age))
 
 > SQL是一门特殊的语言,用于操作关系型数据库.<u>不区分大小写</u>
 
+**布尔值在数据库中True用1代替，False用0代替**
+
 ```python
 # 创建Connection连接
 conn = connect(host='localhost',port=3306,user='root',password='cheng123456',database='python1',charset='utf8')
@@ -894,6 +896,9 @@ Django 就会自动添加一个IntegerField字段做为主键，所以除非你�
 3.unique
  
 如果该值设置为 True, 这个数据字段的值在整张表中必须是唯一的
+
+4.null
+如果该值设置为 True, 这个数据字段的值可以为空
 ```
 
 ```python
@@ -908,3 +913,118 @@ DatetimeField、DateField、TimeField这个三个时间字段，都可以设置�
 
 # ORM数据库的增删改查
 
+## 增加
+
+> 数据表就类似于一个类模板，每个表项就是一个根据类模板生成的实例
+
+views.py
+
+```python
+from app01 import models
+import datetime
+
+#方式1
+#生成数据表对象
+book_obj = models.Book(
+	title="西游记",
+    state=True,
+    pub_date = datetime.datetiem.now(),
+    #pub_date = '2020-12-12'
+    price = 11.11,
+    publich='清华出版社'
+)
+#在数据库中保存对象
+book_obj.save() #保存数据
+return HttpResponse('ok')
+
+#方式2
+models.Book.objects.create(
+	title="西游记",
+    state=True,
+    pub_date = datetime.datetiem.now(),
+    #pub_date = '2020-12-12'
+    price = 11.11,
+    publich='清华出版社'
+)
+return HttpResponse('ok')
+```
+
+```python
+#批量添加数据
+obj_list = []
+for i in range(1,10):
+    obj = models.Book(
+    	title="西游记",
+    	state=True,
+    	pub_date = datetime.datetiem.now(),
+    	#pub_date = '2020-12-12'
+    	price = 11.11,
+    	publich='清华出版社'
+    )
+    obj_list.append(obj)
+    
+models.Book.objects.bulk_create(obj_list)
+```
+
+## 查询
+
+views.py
+
+**全部查询** all()
+
+```python
+def get_book(request):
+    
+    #所有表项
+    obj_list = models.Book.objects.all()
+    print(obj_list) #返回QuerySet对象，类似于列表，每一项都是一个表项
+    print(obj_list[0]) #西游记（因为有__str__()）,Book对象
+    return HttpResponse('ok')
+```
+
+可以在models.py中的类模板中添加
+
+```python
+#等价于java中的toString()，返回字符串类型
+def __str__(self):
+    return self.title
+```
+
+**过滤查询** filter()
+
+```python
+# 结果也是QuerySet对象，每一项都是表项
+bj_list = models.Book.objects.filter(id=1)
+# 等同于where
+```
+
+get() 结果为一个模型类对象
+
+```python
+obj = models.Book.objects.get(id=1) # Book对象
+# 只能查一个，且必须存在，有且仅有一个
+```
+
+## 修改
+
+![image-20210114001040126](C:\Users\cheng\AppData\Roaming\Typora\typora-user-images\image-20210114001040126.png)
+
+![image-20210114001552977](C:\Users\cheng\AppData\Roaming\Typora\typora-user-images\image-20210114001552977.png)
+
+![image-20210114001653837](C:\Users\cheng\AppData\Roaming\Typora\typora-user-images\image-20210114001653837.png)
+
+**update()调用者可以是objects控制器，可以是queryset类型数据，但不能是模式类对象**，所以使用models.Book.objects.get(id=1).update() #Error
+
+update，delete返回受影响的行数
+
+
+
+## 删除
+
+![image-20210114002328604](C:\Users\cheng\AppData\Roaming\Typora\typora-user-images\image-20210114002328604.png)
+
+
+
+![image-20210114002531916](C:\Users\cheng\AppData\Roaming\Typora\typora-user-images\image-20210114002531916.png)
+
+obj=models.Book.objects.all().delete() #全删
