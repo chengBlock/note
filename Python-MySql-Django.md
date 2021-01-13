@@ -40,6 +40,42 @@ print("Hello%s,you are %d years old!" % (name,age))
    'C:\\Users\\cheng\\.ipython']
   ```
 
+  ### CentOS7 安装Python3
+  
+  > www.clcheng.top开放6000~10000端口、3306、443、80
+  
+  **软连接：**
+  
+  ```shell
+  ln 参数 源文件或目录 目标文件或目录
+  
+  ln -s log2013.log link2013
+  ```
+  
+  - -b 删除，覆盖以前建立的链接
+  - -d 允许超级用户制作目录的硬链接
+  - -f 强制执行
+  - -i 交互模式，文件存在则提示用户是否覆盖
+  - -n 把符号链接视为一般目录
+  - -s 软链接(符号链接)
+  - -v 显示详细的处理过程
+  
+  **环境变量：**
+  
+  > Linux export 命令用于设置或显示环境变量
+  
+  ```bash
+  export 参数 变量名称=变量设置值
+  
+  export -p #列出当前的环境变量
+  export MYENV //定义环境变量MYENV
+  export MYENV="path" //定义环境变量
+  ```
+  
+  - -f：代表“变量名称”中为函数名称
+  - -n：删除指定的变量。变量实际上并未删除，只是不会输出到后续指令的执行环境中
+  - -p：列出所有的shell赋予程序的环境变量
+  
   
 
 # MySql基本使用
@@ -310,6 +346,8 @@ Django的MTV模式本质上和MVC是一样的，也是为了各组件间保持�
 
 ## Django操作
 
+[DjangoB站课程博客](https://www.cnblogs.com/clschao/articles/10409764.html)
+
 ### 创建Django项目
 
 1.下载Django
@@ -371,49 +409,193 @@ mysites
 --blog
 ```
 
-### CentOS7 安装Python3
+3.创建简单项目
 
-> www.clcheng.top开放6000~10000端口、3306、443、80
+**urls.py**
 
-**软连接：**
+- r''：原始字符串
+- u'\u5220'：unicode
+- b'abc'：bytes
 
-```shell
-ln 参数 源文件或目录 目标文件或目录
+```python
+from django.contrib import admin
+from django.urls import path
 
-ln -s log2013.log link2013
+from app01 import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    #url：timer/，调用views.py中的timer()
+    path('timer/',views.timer),
+]
 ```
 
-- -b 删除，覆盖以前建立的链接
-- -d 允许超级用户制作目录的硬链接
-- -f 强制执行
-- -i 交互模式，文件存在则提示用户是否覆盖
-- -n 把符号链接视为一般目录
-- -s 软链接(符号链接)
-- -v 显示详细的处理过程
+**views.py**
 
-**环境变量：**
+```python
+from django.shortcuts import render
 
-> Linux export 命令用于设置或显示环境变量
+# Create your views here.
 
-```bash
-export 参数 变量名称=变量设置值
+# 注意：这里必须传入一个request参数，代表接收到的请求
+def timer(request):
 
-export -p #列出当前的环境变量
-export MYENV //定义环境变量MYENV
-export MYENV="path" //定义环境变量
+    import time
+
+    # 获取当前时间
+    cname = 'Alice'
+    ctime = time.time()
+    print(cname)
+
+    #response = wrapped_callback(request, *callback_args, **callback_kwargs)
+    #render是django中自带的库，用于处理返回Template
+    return render(request,"timer.html",{"date":ctime,"cname":cname})
 ```
 
-- -f：代表“变量名称”中为函数名称
-- -n：删除指定的变量。变量实际上并未删除，只是不会输出到后续指令的执行环境中
-- -p：列出所有的shell赋予程序的环境变量
+直接返回，不进行views.py处理
+
+```python
+from django.http import HttpResponse
+from django.shortcuts import render
+
+# Create your views here.
+
+# 注意：这里必须传入一个request参数，代表接收到的请求
+def timer(request):
+
+    import time
+
+    # 获取当前时间
+    ctime = time.time()
+    
+    return HttpResponse(ctime)
+```
+
+**timer.html**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!--{{ 变量名 }}，接收view传过来的数据-->
+<h1>Hello, {{ cname }}</h1>
+<h2>当前时间：{{ date }}</h2>
+
+</body>
+</html>
+```
+
+> render方法默认打开template文件夹下面的html文件，渲染完成之后，返回响应页面数据，最终交给wsgi.py中的socket将页面数据返回给客户端
+>
+> setting.py 中的 TEMPLATE中设置render的默认路径为template下
+
+- BASE_DIR ： setting.py中定义的项目根目录 
+
+- request：HttpRequest对象
+- url(r'^admin/',admin.site.urls) : django提供的内置应用，正则表达式，以admin开头的url都跳转到admin
+- request ：wsgi封装的一个对象
+
+**表单提交**
+
+```html
+<!--提交到本网站的url中，缺省host:post,http://host:port/login/-->
+<form action="/login/" method="post">
+    
+    <input type=submit>
+</form>
+```
+
+post请求在django中有限制，可以通过注释掉setting.py->MIDDLEWAER.'django.middleware,csrf.CsrfViewMiddleware'解除限制
+
+```python
+request.POST : queryDict对象其实就是一个普通字典加工成的一个新的字典对象，操作和字典差不多
+ # <QueryDict:{'username':['root'],'password':['123']}   
+# 拿出来的不是列表，就是里面的值
+uname = request.POST.get("username") #root
+pwd = request.POST.get('password')	#123
+```
+
+用户直接在浏览器输入url访问的请求方式为GET请求，可以通过METHOD判断具体请求类型：
+
+```python
+def login(request):
+    #浏览器输入url操作
+    if request.method == 'GET':
+        return render(request,'login.html')
+    else:
+        #逻辑判断，用户名和密码
+        return render(request,'index.html')
+        else：
+        return HttpResponse('Error')
+```
 
 
 
+### Request对象
 
+**请求常用值**
 
+- path : 返回用户访问的url
+- get_full_path() : 带有参数的url
+- method：请求中使用的HTTP方法的字符串表示
+- GET：包含HTTP GET参数的类字典对象
+- POST：包含所有HTTP POST参数的类字典对象
+- body：请求体，byte类型request.POST就是从body里面提取到的
+- META：请求头
+- REMOTE——ADDR：客服端ip
+- *request.FILES : 接收上传的文件对象，文件对象在body中取不到
+  - request.FILES.get('file') #获取具体的文件类对象（对象名）
 
+### Response
 
+```python
+from django.shortcuts import render,HttpResponse,redirect
 
+return HttpResponse('你好')
 
+# 返回的是经过render()渲染后的HttpResponse对象
+return render(request,"index.html",{"key":"value"})
 
+return redirect('/login/') 
+```
 
+python字典加键值对：
+
+```python
+dict['a'] = 'b' #{'a':'b'}
+```
+
+```python
+#ret仍然是一个HttpResponse对象
+ret = render(request,'home.html',status=202)
+ret['a'] = 'b'
+ret.status_code = 201
+response['Content-Type'] = 'text/html;charset=UTF-8'
+```
+
+- content：响应内容
+- charset：响应内容编码
+- status_code：响应状态码
+
+### JsonResponse对象
+
+> JsonResponse是HttpResponse的子类，专门用来生成JSON编码的响应。默认Content-Type类型被设置为：application/json
+
+```python
+from django.http import JsonResponse
+
+response = JsonResponse({"foo":"bar"})
+response
+print(response.content)  #b'{"foo":"bar"}
+```
+
+```python
+class JsonResponse(data,encoder=DjangoJSONEncoder,safe=True,json_dumps_params=None,**Kwargs)
+```
+
+- data : 应该是一个字典类型
+- safe：False时，data可以为任何能够被转换为JSON格式的对象，默认为True，不是字典类型会抛出TypeError的异常
