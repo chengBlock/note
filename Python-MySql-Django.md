@@ -831,7 +831,7 @@ DATABASES = {
 4. 执行数据库migrate指令
 
    ```bash
-   python manage.py migrations
+   python manage.py makemigrations
    python manage.py migrate
    ```
 
@@ -1007,6 +1007,10 @@ obj = models.Book.objects.get(id=1) # Book对象
 
 ## 修改
 
+- Book.objects：Book数据表的objects控制器，负责控制整个数据表
+- Book.objects.get(id=1)：返回一个Book对象
+- Book.objects.all()：返回一个<QuerySet :[]>列表对象
+
 ![image-20210114001040126](C:\Users\cheng\AppData\Roaming\Typora\typora-user-images\image-20210114001040126.png)
 
 ![image-20210114001552977](C:\Users\cheng\AppData\Roaming\Typora\typora-user-images\image-20210114001552977.png)
@@ -1028,3 +1032,239 @@ update，delete返回受影响的行数
 ![image-20210114002531916](C:\Users\cheng\AppData\Roaming\Typora\typora-user-images\image-20210114002531916.png)
 
 obj=models.Book.objects.all().delete() #全删
+
+## filter的不等号
+
+* __gt 大于
+* __gte 大于等于
+* __lt 小于
+* __lte 小于等于
+* __in 存在一个list范围内
+* __range 在---范围内
+
+
+
+- __startswith 以...开头
+- __istartswith 以...开头，忽略大小写
+- __endswith 以...结尾，忽略大小写
+- __year 日期字段的年份
+- __month 日期字段的月份
+- __day 日期字段的日
+
+
+
+![image-20210114103749996](C:\Users\cheng\AppData\Roaming\Typora\typora-user-images\image-20210114103749996.png)
+
+
+
+# Json传值
+
+```python
+def register(request):
+    if request.method=="GET":
+        result={}
+        username=request.GET.get('username')
+        pwd=request.GET.get('pwd')
+        tel=request.GET.get('tel')
+        age=request.GET.get('age')
+        result['user']=username
+        result['pwd']=pwd
+        result['tel']=tel
+        result['age']=age
+        result=json.dumps(result)
+        return HttpResponse(result,content_type='application/json;charset=utf-8')
+
+```
+
+
+
+# ORM CRUD代码汇总
+
+> 除了添加是使用create(),其他操作就直接使用filter()就行，方便记忆。
+
+- 增
+
+  ```python
+  models.Admin.objects.create(
+              username=username,
+              pwd=pwd
+          )
+  ```
+
+- 查
+
+  > 返回QuerySet类型的列表，filter()缺省参数等同于all()
+
+  ```python
+  obj_list_filter = models.Admin.objects.filter(id=2)
+  ```
+
+- 改
+
+  > 返回被修改的行数
+
+  ```python
+  count = models.Admin.objects.filter(pwd='12').update(
+          pwd='123456'
+      )
+  ```
+
+- 删
+
+  > 返回一个元组，(4, {'app01.Admin': 4})
+
+  ```python
+  obj = models.Admin.objects.filter(id__range=(1,6)).delete()
+  ```
+
+  
+
+```python
+from django.http import JsonResponse
+from django.shortcuts import render, HttpResponse
+
+# Create your views here.
+
+# 首页
+from app01 import models
+
+
+def index(request):
+    return render(request, "index.html")
+
+
+# 数据库操作
+
+# 增
+'''
+    print(request.method)
+    print(request.GET)
+    print(request.POST)
+    print(request.get_full_path())
+    print(request.path)
+    print(request.get_host())
+    print(request.get_port())
+
+    # 获取key对应的value
+    print(request.GET.get('name',default='alice'))
+    print(request.GET.get('pwd',default='123456'))
+    return HttpResponse('ok')
+
+1-Alice
+GET
+<QueryDict: {}>
+<QueryDict: {}>
+/add/
+/add/
+127.0.0.1:8000
+8000
+alice
+123456
+'''
+def add(request):
+
+    # 生成一个表项
+    # models.Admin.objects.create(
+    #     username=username,
+    #     pwd=pwd
+    # )
+
+
+    # GET接收的默认都是字符串
+    if request.method == "GET":
+        result = {}
+        username = request.GET.get('username','none')
+        pwd = request.GET.get('pwd','123456')
+        age = request.GET.get('age','0')
+
+        result['username'] = username
+        result['pwd'] = pwd
+        result['age'] = age
+
+        models.Admin.objects.create(
+            username=username,
+            pwd=pwd
+        )
+
+        print(result)
+
+    return HttpResponse("ok")
+
+
+# 查
+'''
+    # 查看所有表单项
+    obj_list_all = models.Admin.objects.all()
+    print(obj_list_all)
+    print(obj_list_all[0])
+    print(obj_list_all[0].username)
+
+    # 查看符合条件的表单项,filter相当于where
+    obj_list_filter = models.Admin.objects.filter(id=2)
+    print(obj_list_filter)
+
+    # 查看一个且必须有一个表单项
+    obj = models.Admin.objects.get(id=1)
+    print(obj)
+    
+<QuerySet [<Admin: 1-Alice>, <Admin: 2-Alice>]>
+1-Alice
+Alice
+<QuerySet [<Admin: 2-Alice>]>
+1-Alice
+'''
+def query(request):
+
+    # 查看所有表单项
+    obj_list_all = models.Admin.objects.all()
+    print(obj_list_all)
+    print(obj_list_all[0])
+    print(obj_list_all[0].username)
+
+    # 查看符合条件的表单项,filter相当于where
+    obj_list_filter = models.Admin.objects.filter(id=2)
+    print(obj_list_filter)
+
+    # 查看一个且必须有一个表单项
+    obj = models.Admin.objects.get(id=1)
+    print(obj)
+
+    return HttpResponse('ok')
+
+# 改
+def update(request):
+
+    # 方式1
+    #获得一个表项，不能使用update
+    # obj = models.Admin.objects.get(id=3)
+    # obj.username = 'NB'
+    # 保存修改的字段，未修改的保持原有值
+    # obj.save()
+
+    #方式2，update()一次改变选择的queryset中的数据项并返回受影响的行数
+    count = models.Admin.objects.filter(pwd='12').update(
+        pwd='123456'
+    )
+
+    print(count)
+    return HttpResponse(count)
+
+
+# 删
+
+'''
+ obj = models.Admin.objects.filter(id__range=(1,6)).delete()
+
+(4, {'app01.Admin': 4})
+'''
+
+def delete(request):
+
+    # filter()是一个函数，不能直接使用>=,
+    obj = models.Admin.objects.filter(id__range=(1,6)).delete()
+
+    print(obj)
+    return HttpResponse('ok')
+
+```
+
