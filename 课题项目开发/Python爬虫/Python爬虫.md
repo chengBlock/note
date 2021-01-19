@@ -25,3 +25,65 @@
 4. 保持数据
 
    保存形式多样，可以存为文本，也可以保存到数据库，或者保持特定格式的文件。
+
+# 编码规范
+
+- 一般Python程序第一行需要加入
+
+   `# -*-coding:utf-8 -*-` 或者 `# coding=utf-8`
+
+  这样可以在代码中包含中文
+
+- Python中可复用的代码段写成函数，提高代码复用率
+
+- Python文件中可以加入main函数当做程序执行入口，用于测试程序：
+
+  > `if __name__ ==  "__main__" :`
+
+- 三引号可以用于打印多行内容，每行结尾需要显示的输入\n才能换行；
+
+- 字符串前加一个r表示不转义
+
+
+
+# 爬虫库
+
+- bs4	#网页解析，获取数据
+- re       #正则表达式，文字匹配
+- urllib    #制定url，获取网页数据
+- xlwt      #进行excel操作
+- sqlite3  #进行SQLite数据库操作
+
+
+
+# 构建流程
+
+```python
+from bs4 import BeautifulSoup #网页解析
+import re	#正则
+impore urllib.request,urllib.error #url
+import xlwt	#excel操作
+import sqlite3 #SQLite数据库
+
+# 执行函数
+def main():
+    #1.爬取网页
+    #2.解析数据
+    #3.保存数据
+    
+# 爬虫网页
+def getData(baseurl):
+    
+# 保存数据
+def saveData(savePath):
+    
+# 执行入口
+if __name__ == "__main__";
+	# 执行函数
+    main()
+```
+
+
+
+
+
