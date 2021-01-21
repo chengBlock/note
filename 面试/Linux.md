@@ -224,6 +224,90 @@ PATH这个目录下放的可执行程序，在系统任何地方都可以直接�
 
   这个目录一般是空的，当系统非法关机后，这里就存放了一些文件
 
+## 2.5 主机名
+
+> 主机名配置文件(static)
+>
+> /etc/hostname
+
+```bash
+# 查看主机名配置文件，查看到的是静态的
+cat /etc/hostname
+
+# 查看当前linux操作系统相关信息（主机名称、内核版本号、硬件架构和操作系统类型等）
+uname -a
+[root@CentOS ~]# uname -a
+Linux CentOS 3.10.0-1160.11.1.el7.x86_64 #1 SMP Fri Dec 18 16:34:56 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+
+# 查看操作系统环境
+cat /etc/redhat-release
+[root@CentOS ~]# cat /etc/redhat-release
+CentOS Linux release 7.9.2009 (Core)
+```
+
+在CentOS中有三种定义的主机名：
+
+- Static hostname：静态主机名
+
+  也称内核主机名，是系统在启动时从/etc/hostname文件中自动初始化的主机名
+
+- Tansient hostname：瞬态主机名
+
+  系统运行期间临时分配的主机名。例如，通过DHCP或mDNS服务器分配
+
+- Pretty hostname：灵活主机名
+
+  允许使用自由形式（包括特殊/空白主机名）的主机名，以展示给终端用户
+
+在CentOS7中，有个叫hostnamectl的命令行工具，它允许查看或修改与主机名相关的配置
+
+### 2.5.1 查看主机名
+
+```bash
+# 查看当前主机名的情况
+[root@CentOS ~]# hostnamectl
+   Static hostname: CentOS
+         Icon name: computer-vm
+           Chassis: vm
+        Machine ID: 20190711105006363114529432776998
+           Boot ID: f3da6a8f9c3f4a1ba3437fa82562ef33
+    Virtualization: kvm
+  Operating System: CentOS Linux 7 (Core)
+       CPE OS Name: cpe:/o:centos:centos:7
+            Kernel: Linux 3.10.0-1160.11.1.el7.x86_64
+      Architecture: x86-64
+```
+
+```bash
+# 只查看静态、瞬时或灵活主机名
+hostnamectl --static
+hostnamectl --transient
+hostnamectl --pretty
+```
+
+### 2.5.2 修改主机名
+
+> 在修改静态/瞬态主机名时，任何特殊字符或空白字符会被移除，而提供的参数中的任何大写字母会自动转化为小写
+
+```bash
+# 修改瞬时名
+hostname transientName
+[root@CentOS ~]# hostname xh01
+[root@CentOS ~]# hostname
+xh01
+[root@CentOS ~]# hostnamectl --transient
+xh01
+```
+
+```bash
+# 修改静态主机名
+hostnamectl set-hostname xxx
+```
+
+**永久生效：**
+
+修改配置文件/etc/hostname来实现主机名的修改。把该文件内容hostname中的name替换成自己想要的主机名重启即可。
+
 # 3 vi 和 vim
 
 ## 3.1 三种模式
@@ -238,12 +322,104 @@ PATH这个目录下放的可执行程序，在系统任何地方都可以直接�
 
 ### 3.1.1 快捷键
 
+**撤销：**
+
+```bash
+u	撤销上一步操作
+```
+
+**反撤销：**
+
+```bash
+ctrl + r	反撤销
+```
+
+**U命令：**
+
+```bash
+U 命令	该命令会一次性撤销自上次移动到当前行以来做过的所有操作，再使用一次 U 命令则撤销之前的 U 命令所做的操作，恢复被撤销的内容。
+```
+
+**复制：**y
+
+```bash
 yy 拷贝当前行
 5yy 拷贝当前行向下5行
+```
 
+**粘贴：**p
+
+```bash
 p 粘贴
+```
 
-dd	删除
-5dd	删除5行
+**删除：**d
 
-/关键字 回车	查找，输入n就是查找下一个
+```bash
+dd 删除当前行
+5dd 删除当前行向下5行
+```
+
+**剪切：**c
+
+```bash
+cw	剪切一个单词
+cl	剪切一个字母
+cc 剪切一整行
+c5c	剪切5行
+```
+
+
+
+**查找：**
+
+```bash
+#命令行模式：
+/key	回车搜索
+输入n查找下一个
+输入N查找上一个
+```
+
+**行定位：**
+
+```bash
+G	最末行
+gg	最首行
+num + shift + g		定位到num行
+:num	光标定位到num行
+```
+
+## 3.2 进入插入模式
+
+**插入模式：**
+
+```bash
+"i"                在光标所在位置插入字符
+"I"               在光标所在行的行首插入字符
+"o"              在光标所在行的下一行新行插入字符
+"O"             在光标所在行的上以行新行插入
+"s"              删除光标所在字符并插入字符
+"S"              删除光标所在行并插入字符
+"a"              光标所在字符的下一个字符插入
+"A"              光标所在行的行尾插入字符
+```
+
+# 4 关机注销
+
+## 4.1 关机&重启
+
+- shutdown -h now	立刻关机
+  - -h	halt：关机、停止、停下
+- shutdown -h 1 "comment"    指定一分钟后关机，并以广播的形式通知所有的多用户终端”comment“信息
+- shutdown -r now    重启
+- halt    立刻关机
+- reboot     立刻重启
+- sync    将内存数据同步到磁盘中
+- shutdown   默认执行”shutdown -h -1"
+
+*目前的shutdown/halt/reboot等命令在关机前都会自动执行sync
+
+## 4.2 登录&注销
+
+- 正常生产环境应该使用用户账户登录，需要时再使用su命令切换到系统管理员身份，避免权限过大，出现操作失误
+- logout注销指令在图形界面运行级别无效，在命令行界面有效
