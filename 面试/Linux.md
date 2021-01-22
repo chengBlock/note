@@ -593,3 +593,139 @@ usermod -g group1 user1
 gpasswd -a user1 group2
 ```
 
+# 7 运行级别
+
+**运行级别说明：**
+
+```bash
+0：关机
+1：单用户	（找回丢失root密码）
+2：多用户无网络服务	（一般不适用）
+3：多用户有网络服务
+4：系统未使用保留给用户
+5：图像界面
+6：系统重启
+
+常用的运行级别是3和5，也可以指定默认用户级别
+```
+
+## 7.1 切换用户级别
+
+**命令：**init [0123456]
+
+```bash
+[root@CentOS ~]# cat /etc/inittab
+# inittab is no longer used when using systemd.
+#
+# ADDING CONFIGURATION HERE WILL HAVE NO EFFECT ON YOUR SYSTEM.
+#
+# Ctrl-Alt-Delete is handled by /usr/lib/systemd/system/ctrl-alt-del.target
+#
+# systemd uses 'targets' instead of runlevels. By default, there are two main targets:
+#
+# multi-user.target: analogous to runlevel 3
+# graphical.target: analogous to runlevel 5
+#
+# To view current default target, run:
+# systemctl get-default
+#
+# To set a default target, run:
+# systemctl set-default TARGET.target
+```
+
+**查看当前默认用户运行级别:**
+
+```bash
+systemctl get-default
+```
+
+**设置默认用户运行级别：**
+
+```bash
+systemctl set-default TARGET.target
+```
+
+- multi-user.target->runlevel 3（多用户有网络服务）
+- graphical.target->runlevel 5（图形界面）
+
+# 8 帮助指令
+
+- man [命令或配置文件]    （获取帮助信息）
+- help 命令      （获得shell内置命令的帮助信息）
+- 百度
+
+# 9 时间日期类
+
+**date 命令参数：**
+
+```
+-d<字符串>：显示字符串所指的日期与时间。字符串前后必须加上双引号； 
+-s<字符串>：根据字符串来设置日期与时间。字符串前后必须加上双引号； 
+-u：显示GMT； 
+--help：在线帮助； 
+--version：显示版本信息
+```
+
+## 9.1 显示当前日期
+
+```bash
+# 基本语法
+1)date			显示当前时间
+2)date "+ %Y"		显示当前年份
+3)date "+ %m"		显示当前月份
+4)date "+ %d"		显示当前日期
+5)date "+ %Y-%m-%d %H:%M:%S" 	可以插入格式任意字符
+6)date +%s		时间戳
+
+# 日历
+1)cal 		显示本月日历
+2)cal 年份
+```
+
+```bash
+clcheng@clcheng MINGW64 ~
+$ date "+%Y/%m/%d %H:%M:%S"
+2021/01/22 11:30:26
+```
+
+- Y：年
+- m：月
+- d：日
+- H：时
+- M：分
+- S：秒
+
+## 9.2 设置时间
+
+- date -s "时间"
+  - 只是暂时更新，重启后恢复实际时间
+
+## 9.3 恢复&更新linux系统时间
+
+- 安装ntpdate
+  - yum install ntpdate
+- 选择一个时间服务器来更新时间
+  - ntpdate time.windws.com
+
+## 9.4 时区(Time Zone)
+
+> 由于世界各国家与地区经度不同，地方时也有所不同，因此会划分为不同的时区。
+
+​		有关国际会议决定将地球表面按经线从东到西，划成一个个区域，并且规定相邻区域的时间相差1小时。在同一区域内的东端和西端的人看到太阳升起的时间最多相差不过1小时。当人们跨过一个区域，就将自己的时钟校正1小时（向西减1小时，向东加1小时），跨过几个区域就加或减几小时。这样使用起来就很方便。
+
+​		正式的时区划分包括24个时区，每一时区由一个英文字母表示。每隔经度15°划分一个时区，有一个例外，每个时区有一条中央子午线；例如，GMT属于“z”区，因此其时间后通常添加后缀“Z”（口语中用后缀“Zulu”）。
+
+| 时区  | 时区中心线 |
+| :---: | :--------: |
+|  UTC  |     0°     |
+| UTC+8 |   120°E    |
+
+中国时间是东八区，使用北京时间作为全国统一时间
+
+### 9.4.1 CST
+
+中国标准时间：China Standard Time UT+8:00
+
+### 9.4.2 GMT
+
+格林尼治标准时间：一般指世界时
