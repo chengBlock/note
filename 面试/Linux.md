@@ -729,3 +729,506 @@ $ date "+%Y/%m/%d %H:%M:%S"
 ### 9.4.2 GMT
 
 格林尼治标准时间：一般指世界时
+
+# 10.RPM & YUM
+
+## 10.1 rpm包的管理
+
+​		rpm是linux用于互联网下载包的打包及安装工具，它包含在某些Linux分发版中。它生成具有.rpm扩展名的文件。RPM是RedHat Package Manager(RedHat 软件包管理工具)的缩写，(.rpm文件)类似于Windows的setup.exe,这一文件格式已经成为公认的行业标准（suse,redhat,centos等）
+
+### 10.1.1 rpm包的简单查询指令
+
+- 查询已安装的rpm列表：rpm -qa | grep mysql
+
+  ```bash
+  [root@CentOS ~]# rpm -qa | grep mysql
+  mysql-community-client-8.0.23-1.el7.x86_64
+  mysql-community-libs-8.0.23-1.el7.x86_64
+  mysql-community-client-plugins-8.0.23-1.el7.x86_64
+  mysql80-community-release-el7-3.noarch
+  mysql-community-common-8.0.23-1.el7.x86_64
+  *mysql-community-server-8.0.23-1.el7.x86_64 
+  ```
+
+- 查询软件包信息：rpm -qi mysql-community-server-8.0.23-1.el7.x86_64
+
+  ```bash
+  [root@CentOS ~]# rpm -qi mysql-community-server-8.0.23-1.el7.x86_64
+  *Name        : mysql-community-server
+  *Version     : 8.0.23
+  *Release     : 1.el7
+  *Architecture: x86_64
+  Install Date: 2021年01月22日 星期五 11时39分26秒
+  Group       : Applications/Databases
+  Size        : 2535835057
+  License     : Copyright (c) 2000, 2020, Oracle and/or its affiliates. Under GPLv2 license as shown in the Description field.
+  Signature   : DSA/SHA1, 2020年12月16日 星期三 17时16分31秒, Key ID 8c718d3b5072e1f5
+  Source RPM  : mysql-community-8.0.23-1.el7.src.rpm
+  Build Date  : 2020年12月11日 星期五 16时53分12秒
+  Build Host  : pb2-el7-09.appad3iad.mysql2iad.oraclevcn.com
+  Relocations : (not relocatable)
+  Packager    : MySQL Release Engineering <mysql-build@oss.oracle.com>
+  Vendor      : Oracle and/or its affiliates
+  URL         : http://www.mysql.com/
+  Summary     : A very fast and reliable SQL database server
+  Description :
+  The MySQL(TM) software delivers a very fast, multi-threaded, multi-user,
+  and robust SQL (Structured Query Language) database server. MySQL Server
+  is intended for mission-critical, heavy-load production systems as wellas for embedding into mass-deployed software. MySQL is a trademark of
+  Oracle and/or its affiliates
+  
+  The MySQL software has Dual Licensing, which means you can use the MySQL
+  software free of charge under the GNU General Public License
+  (http://www.gnu.org/licenses/). You can also purchase commercial MySQL
+  licenses from Oracle and/or its affiliates if you do not wish to be bound by the terms of
+  the GPL. See the chapter "Licensing and Support" in the manual for
+  further info.
+  
+  The MySQL web site (http://www.mysql.com/) provides the latest news andinformation about the MySQL software.  Also please see the documentation
+  and the manual for more information.
+  
+  This package includes the MySQL server binary as well as related utilities
+  to run and administer a MySQL server.
+  ```
+
+- 查询软件包中的文件：rpm -ql mysql
+
+  ```bash
+  [root@CentOS ~]# rpm -ql mysql-community-server-8.0.23-1.el7.x86_64
+  /etc/logrotate.d/mysql
+  /etc/my.cnf
+  /etc/my.cnf.d
+  /usr/bin/ibd2sdi
+  /usr/bin/innochecksum
+  /usr/bin/lz4_decompress
+  /usr/bin/my_print_defaults
+  /usr/bin/myisam_ftdump
+  /usr/bin/myisamchk
+  /usr/bin/myisamlog
+  /usr/bin/myisampack
+  /usr/bin/mysql_secure_installation
+  /usr/bin/mysql_ssl_rsa_setup
+  /usr/bin/mysql_tzinfo_to_sql
+  /usr/bin/mysql_upgrade
+  /usr/bin/mysqld_pre_systemd
+  /usr/bin/mysqldumpslow
+  /usr/bin/perror
+  /usr/bin/zlib_decompress
+  /usr/lib/systemd/system/mysqld.service
+  /usr/lib/systemd/system/mysqld@.service
+  /usr/lib/tmpfiles.d/mysql.conf
+  /usr/lib64/mysql/mecab
+  /usr/lib64/mysql/mecab/dic
+  /usr/lib64/mysql/mecab/dic/ipadic_euc-jp
+  /usr/lib64/mysql/mecab/dic/ipadic_euc-jp/char.bin
+  /usr/lib64/mysql/mecab/dic/ipadic_euc-jp/dicrc
+  /usr/lib64/mysql/mecab/dic/ipadic_euc-jp/left-id.def
+  /usr/lib64/mysql/mecab/dic/ipadic_euc-jp/matrix.bin
+  /usr/lib64/mysql/mecab/dic/ipadic_euc-jp/pos-id.def
+  /usr/lib64/mysql/mecab/dic/ipadic_euc-jp/rewrite.def
+  /usr/lib64/mysql/mecab/dic/ipadic_euc-jp/right-id.def
+  /usr/lib64/mysql/mecab/dic/ipadic_euc-jp/sys.dic
+  /usr/lib64/mysql/mecab/dic/ipadic_euc-jp/unk.dic
+  /usr/lib64/mysql/mecab/dic/ipadic_sjis
+  /usr/lib64/mysql/mecab/dic/ipadic_sjis/char.bin
+  /usr/lib64/mysql/mecab/dic/ipadic_sjis/dicrc
+  /usr/lib64/mysql/mecab/dic/ipadic_sjis/left-id.def
+  /usr/lib64/mysql/mecab/dic/ipadic_sjis/matrix.bin
+  /usr/lib64/mysql/mecab/dic/ipadic_sjis/pos-id.def
+  /usr/lib64/mysql/mecab/dic/ipadic_sjis/rewrite.def
+  /usr/lib64/mysql/mecab/dic/ipadic_sjis/right-id.def
+  /usr/lib64/mysql/mecab/dic/ipadic_sjis/sys.dic
+  /usr/lib64/mysql/mecab/dic/ipadic_sjis/unk.dic
+  /usr/lib64/mysql/mecab/dic/ipadic_utf-8
+  /usr/lib64/mysql/mecab/dic/ipadic_utf-8/char.bin
+  /usr/lib64/mysql/mecab/dic/ipadic_utf-8/dicrc
+  /usr/lib64/mysql/mecab/dic/ipadic_utf-8/left-id.def
+  /usr/lib64/mysql/mecab/dic/ipadic_utf-8/matrix.bin
+  /usr/lib64/mysql/mecab/dic/ipadic_utf-8/pos-id.def
+  /usr/lib64/mysql/mecab/dic/ipadic_utf-8/rewrite.def
+  /usr/lib64/mysql/mecab/dic/ipadic_utf-8/right-id.def
+  /usr/lib64/mysql/mecab/dic/ipadic_utf-8/sys.dic
+  /usr/lib64/mysql/mecab/dic/ipadic_utf-8/unk.dic
+  /usr/lib64/mysql/mecab/etc
+  /usr/lib64/mysql/mecab/etc/mecabrc
+  /usr/lib64/mysql/plugin
+  /usr/lib64/mysql/plugin/adt_null.so
+  /usr/lib64/mysql/plugin/auth_socket.so
+  /usr/lib64/mysql/plugin/component_audit_api_message_emit.so
+  /usr/lib64/mysql/plugin/component_log_filter_dragnet.so
+  /usr/lib64/mysql/plugin/component_log_sink_json.so
+  /usr/lib64/mysql/plugin/component_log_sink_syseventlog.so
+  /usr/lib64/mysql/plugin/component_mysqlbackup.so
+  /usr/lib64/mysql/plugin/component_query_attributes.so
+  /usr/lib64/mysql/plugin/component_reference_cache.so
+  /usr/lib64/mysql/plugin/component_validate_password.so
+  /usr/lib64/mysql/plugin/connection_control.so
+  /usr/lib64/mysql/plugin/ddl_rewriter.so
+  /usr/lib64/mysql/plugin/debug
+  /usr/lib64/mysql/plugin/debug/adt_null.so
+  /usr/lib64/mysql/plugin/debug/auth_socket.so
+  /usr/lib64/mysql/plugin/debug/component_audit_api_message_emit.so
+  /usr/lib64/mysql/plugin/debug/component_log_filter_dragnet.so
+  /usr/lib64/mysql/plugin/debug/component_log_sink_json.so
+  /usr/lib64/mysql/plugin/debug/component_log_sink_syseventlog.so
+  /usr/lib64/mysql/plugin/debug/component_mysqlbackup.so
+  /usr/lib64/mysql/plugin/debug/component_query_attributes.so
+  /usr/lib64/mysql/plugin/debug/component_reference_cache.so
+  /usr/lib64/mysql/plugin/debug/component_validate_password.so
+  /usr/lib64/mysql/plugin/debug/connection_control.so
+  /usr/lib64/mysql/plugin/debug/ddl_rewriter.so
+  /usr/lib64/mysql/plugin/debug/group_replication.so
+  /usr/lib64/mysql/plugin/debug/ha_example.so
+  /usr/lib64/mysql/plugin/debug/ha_mock.so
+  /usr/lib64/mysql/plugin/debug/innodb_engine.so
+  /usr/lib64/mysql/plugin/debug/keyring_file.so
+  /usr/lib64/mysql/plugin/debug/keyring_udf.so
+  /usr/lib64/mysql/plugin/debug/libmemcached.so
+  /usr/lib64/mysql/plugin/debug/libpluginmecab.so
+  /usr/lib64/mysql/plugin/debug/locking_service.so
+  /usr/lib64/mysql/plugin/debug/mypluglib.so
+  /usr/lib64/mysql/plugin/debug/mysql_clone.so
+  /usr/lib64/mysql/plugin/debug/mysql_no_login.so
+  /usr/lib64/mysql/plugin/debug/rewrite_example.so
+  /usr/lib64/mysql/plugin/debug/rewriter.so
+  /usr/lib64/mysql/plugin/debug/semisync_master.so
+  /usr/lib64/mysql/plugin/debug/semisync_slave.so
+  /usr/lib64/mysql/plugin/debug/validate_password.so
+  /usr/lib64/mysql/plugin/debug/version_token.so
+  /usr/lib64/mysql/plugin/group_replication.so
+  /usr/lib64/mysql/plugin/ha_example.so
+  /usr/lib64/mysql/plugin/ha_mock.so
+  /usr/lib64/mysql/plugin/innodb_engine.so
+  /usr/lib64/mysql/plugin/keyring_file.so
+  /usr/lib64/mysql/plugin/keyring_udf.so
+  /usr/lib64/mysql/plugin/libmemcached.so
+  /usr/lib64/mysql/plugin/libpluginmecab.so
+  /usr/lib64/mysql/plugin/locking_service.so
+  /usr/lib64/mysql/plugin/mypluglib.so
+  /usr/lib64/mysql/plugin/mysql_clone.so
+  /usr/lib64/mysql/plugin/mysql_no_login.so
+  /usr/lib64/mysql/plugin/rewrite_example.so
+  /usr/lib64/mysql/plugin/rewriter.so
+  /usr/lib64/mysql/plugin/semisync_master.so
+  /usr/lib64/mysql/plugin/semisync_slave.so
+  /usr/lib64/mysql/plugin/validate_password.so
+  /usr/lib64/mysql/plugin/version_token.so
+  /usr/lib64/mysql/private
+  /usr/lib64/mysql/private/libprotobuf-lite.so.3.11.4
+  /usr/lib64/mysql/private/libprotobuf.so.3.11.4
+  /usr/sbin/mysqld
+  /usr/sbin/mysqld-debug
+  /usr/share/doc/mysql-community-server-8.0.23
+  /usr/share/doc/mysql-community-server-8.0.23/INFO_BIN
+  /usr/share/doc/mysql-community-server-8.0.23/INFO_SRC
+  /usr/share/doc/mysql-community-server-8.0.23/LICENSE
+  /usr/share/doc/mysql-community-server-8.0.23/README
+  /usr/share/man/man1/ibd2sdi.1.gz
+  /usr/share/man/man1/innochecksum.1.gz
+  /usr/share/man/man1/lz4_decompress.1.gz
+  /usr/share/man/man1/my_print_defaults.1.gz
+  /usr/share/man/man1/myisam_ftdump.1.gz
+  /usr/share/man/man1/myisamchk.1.gz
+  /usr/share/man/man1/myisamlog.1.gz
+  /usr/share/man/man1/myisampack.1.gz
+  /usr/share/man/man1/mysql_secure_installation.1.gz
+  /usr/share/man/man1/mysql_ssl_rsa_setup.1.gz
+  /usr/share/man/man1/mysql_tzinfo_to_sql.1.gz
+  /usr/share/man/man1/mysql_upgrade.1.gz
+  /usr/share/man/man1/mysqldumpslow.1.gz
+  /usr/share/man/man1/mysqlman.1.gz
+  /usr/share/man/man1/perror.1.gz
+  /usr/share/man/man1/zlib_decompress.1.gz
+  /usr/share/man/man8/mysqld.8.gz
+  /usr/share/mysql-8.0/dictionary.txt
+  /usr/share/mysql-8.0/innodb_memcached_config.sql
+  /usr/share/mysql-8.0/install_rewriter.sql
+  /usr/share/mysql-8.0/mysql-log-rotate
+  /usr/share/mysql-8.0/uninstall_rewriter.sql
+  /var/lib/mysql
+  /var/lib/mysql-files
+  /var/lib/mysql-keyring
+  /var/run/mysqld
+  ```
+
+- 查询文件所属的软件包：rpm -qf file
+
+  ```bash
+  [root@CentOS ~]# rpm -qf /var/run/mysqld/
+  mysql-community-server-8.0.23-1.el7.x86_64
+  ```
+
+### 10.1.2 rpm包名基本格式
+
+mysql-community-common-8.0.23-1.el7.x86_64
+
+- 软件名：mysql-community-common
+- 版本号：8.0.23
+- 使用操作系统：1.el7
+  - EL5软件包用于在Red Hat 5.x, CentOS 5.x, CloudLinux 5.x的安装
+  - EL6软件包用于在Red Hat 6.x, CentOS 6.x, and CloudLinux 6.x进行安装
+  - EL7 软件包用于在Red Hat 7.x, CentOS 7.x, and CloudLinux 7.x的安装
+- 系统架构：x86_64
+
+```bash
+*Name        : mysql-community-server
+*Version     : 8.0.23
+*Release     : 1.el7
+*Architecture: x86_64
+```
+
+### 10.1.3 卸载rpm包
+
+- rpm -e 包名：//erase
+
+如果其他软件包依赖要卸载的软件包，卸载时则会产生错误信息。但是可以增加参数`--nodeps`就可以强制删除，一般不推荐这样做，因为依赖于该软件包的程序可能无法运行。所以卸载软件都是先卸载高层，再卸载底层软件。
+
+### 10.1.4 安装rpm包
+
+- rpm -ivh 本地包文件
+  - i：install 安装
+  - v：verbose 提示
+  - h：hash 进度条
+
+## 10.2 yum
+
+Yum是一个Shell前端软件包管理器，基于RPM包管理，能够从指定的服务器自动下载RPM包并且安装，可以自动处理依赖性关系，并且一次安装所有依赖的软件包
+
+### 10.2.1 yum的基本指令
+
+- 安装：yum install package
+- 全部更新：yum update/upgrade
+- 更新指定程序：yum update/upgrade package
+- 检查可更新的程序：yum check-update
+- 显示可以安装的程序包：yum list
+- 显示指定的可以安装的程序包：yum list package
+- 删除程序：yum remove package
+- 查看程序package的依赖情况：yum deplist package
+
+# 11.配置Java EE开发环
+
+## 11.1 linux环境配置命令
+
+### 11.1.1 软连接
+
+```shell
+ln 参数 源文件或目录 目标文件或目录
+
+ln -s log2013.log link2013
+```
+
+- -b 删除，覆盖以前建立的链接
+- -d 允许超级用户制作目录的硬链接
+- -f 强制执行
+- -i 交互模式，文件存在则提示用户是否覆盖
+- -n 把符号链接视为一般目录
+- -s 软链接(符号链接)
+- -v 显示详细的处理过程
+
+### 11.1.2 环境变量
+
+> Linux export 命令用于设置或显示环境变量
+
+```bash
+echo $PATH
+```
+
+```bash
+export 参数 变量名称=变量设置值
+
+export -p #列出当前的环境变量
+export MYENV #定义环境变量MYENV
+export MYENV="path" #定义环境变量
+export PATH=$JAVA_HOME/bin:$PATH #添加path
+```
+
+- -f：代表“变量名称”中为函数名称
+- -n：删除指定的变量。变量实际上并未删除，只是不会输出到后续指令的执行环境中
+- -p：列出所有的shell赋予程序的环境变量
+
+### 11.1.3 环境变量详解
+
+**方法一：**直接修改当前`PATH`值
+
+```bash
+# 添加环境变量,"="两边不能有空格
+# JAVA_HOME变量保存时结尾不需要加上"/"
+export PATH=$JAVA_HOME/bin:$PATH
+```
+
+生效方式：立即生效
+
+有效期限：临时改变，只能在当前终端窗口有效
+
+用户局限：仅对当前用户
+
+**方法二：**利用`.bashrc`文件开机自动执行的特性
+
+```bash
+vim ~/.bashrc
+# 在最后一行添加
+export PATH=$JAVA_HOME/bin:$PATH
+```
+
+生效方式：`source ./.bashrc`或重启终端
+
+有效期限：永久有效
+
+用户局限：仅对当前用户
+
+**方法三：**修改用户环境变量`/etc/profile`
+
+```bash
+vim /etc/profile
+# 找到设置PATH的行，添加
+export JAVA_HOME=/usr/local/java/jdk1.8.0-261
+export PATH=$JAVA_HOME/bin:$PATH
+```
+
+生效方式：系统重启（因为`/etc/profile`文件在用户第一次登录时执行）
+
+有效期限：永久有效
+
+用户局限：对所有用户
+
+**方法四：**修改系统环境变量`/etc/environment`
+
+```bash
+vim /etc/environment
+# 直接修改PATH变量
+PATH="/usr/local"
+```
+
+**小结：**
+
+- /etc/profile 是所有用户的环境变量
+- /etc/environment是系统的环境变量
+
+登录系统时shell读取的顺序应该是：
+
+```bash
+/etc/profile -> /etc/environment - > HOME/.profile -> HOME/.env
+```
+
+所以，如果同一个变量在用户环境`/etc/profile`和系统环境`/etc/environment`有不同的值，那就应该是以用户环境为准
+
+- **HOME**是个系统变量，代表当前用户的家目录路径
+
+  ```bash
+  [clcheng@CentOS root]$ echo $HOME
+  /home/clcheng
+  ```
+
+（1）/etc/profile： 此文件为系统的每个用户设置环境信息,当用户第一次登录时,该文件被执行. 并从/etc/profile.d目录的配置文件中搜集shell的设置。
+（2）/etc/bashrc: 为每一个运行bash shell的用户执行此文件.当bash shell被打开时,该文件被读取。
+（3）~/.bash_profile: 每个用户都可使用该文件输入专用于自己使用的shell信息,当用户登录时,该文件仅仅执行一次!默认情况下,他设置一些环境变量,执行用户的.bashrc文件。
+（4）~/.bashrc: 该文件包含专用于你的bash shell的bash信息,当登录时以及每次打开新的shell时,该该文件被读取。
+（5） ~/.bash_logout:当每次退出系统(退出bash shell)时,执行该文件. 另外,/etc/profile中设定的变量(全局)的可以作用于任何用户,而~/.bashrc等中设定的变量(局部)只能继承 /etc/profile中的变量,他们是"父子"关系。
+（6）~/.bash_profile 是交互式、login 方式进入 bash 运行的~/.bashrc 是交互式 non-login 方式进入 bash 运行的通常二者设置大致相同，所以通常前者会调用后者。
+
+### 11.1.4 Linux之.bashrc文件作用
+
+> Linux 系统中很多 shell，包括bash，sh，zsh，dash 和 korn 等，不管哪种 shell 都会有一个 `.bashrc` 的隐藏文件，它就相当于 shell 的配置文件。
+
+一般会有多个`.bashrc`文件，打开终端时就会自动执行：
+
+```bash
+[root@CentOS ~]# find / -name .bashrc
+/home/clcheng/.bashrc
+/home/cheng/.bashrc
+/home/zwj/.bashrc
+/home/test/.bashrc
+/etc/skel/.bashrc
+```
+
+不同目录下的 `.bashrc` 文件其作用不尽相同，比如：
+
+- `/etc/skel/.bashrc`：文件将被复制到系统上创建的任何新用户的主文件夹中
+- `/home/clcheng/.bashrc`：是bash的配置文件，保存个人的一些个性化设置，如别名、路径等
+
+```bash
+[root@CentOS ~]# cat .bashrc
+# .bashrc
+
+# User specific aliases and functions
+
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi
+================================================================
+[root@CentOS ~]# cat /etc/skel/.bashrc
+# .bashrc
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi
+
+# Uncomment the following line if you don't like systemctl's auto-paging feature:
+# export SYSTEMD_PAGER=
+
+# User specific aliases and functions
+=================================================================
+[root@CentOS ~]# cat /home/clcheng/.bashrc
+# .bashrc
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi
+
+# Uncomment the following line if you don't like systemctl's auto-paging feature:
+# export SYSTEMD_PAGER=
+
+# User specific aliases and functions
+```
+
+每次修改`.bashrc`后，使用`source ~/.bashrc`就可以立刻加载修改后的设置，使之立即生效。
+
+一般会在`.bash_profile`文件中显式调用`.bashrc`。登陆 `linux` 启动 `bash`时首先会去读取 `~/.bash_profile`文件，这样 `~/.bashrc`也就得到执行了，你的个性化设置也就生效了。
+
+利用这一特性，可以实现一些个性化设置，如：Linux 系统开机执行自动某个脚本文件等，这在自动化运维方面有一定的用处。
+
+1、修改 `/home/hj/.bashrc` 文件：
+
+```python
+sudo vim /home/hj/.bashrc
+
+# 在最后添加两句后保存
+echo '这句话开机就会启动'			# 打印输出
+python3 /home/hj/test.py			# 执行 test.py  这个脚本
+```
+
+2、执行`source ./.bashrc`立即生效、或重启终端窗口。
+
+## 11.2 安装JDK
+
+```bash
+1.mkdir /opt/jdk		#/opt是额外安装软件摆放的位置
+2.jdk通过xftp6上传到/opt/jdk下
+3.cd /opt/jdk
+4.解压 tar -zxvf jdk-8u261-linux-x64.tar.gz
+5.mkdir /usr/local/java
+6.mv /opt/jdk/jdk1.8.0_261 /usr/local/java
+7.vim /etc/profile	#配置环境变量的配置文件
+# 在文件末尾添加export语句
+8.export JAVA_HOME=/usr/local/java/jdk1.8.0_261 #定义环境变量
+9.export PATH=$JAVA_HOME/bin:$PATH	#添加环境变量
+10.source /etc/profile		#让配置文件生效
+
+#测试是否生效
+java -version
+```
+
+**注意：**linux执行程序时，若直接在终端输入程序名会优先从环境变量中查询
+
+- `./java -version`：执行当前文件下的程序
+- `java -version`：执行环境变量下的程序
+
+## 11.3 安装Tomcat
+
