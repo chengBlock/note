@@ -1232,3 +1232,19 @@ java -version
 
 ## 11.3 安装Tomcat
 
+1. 解压缩
+2. `startup.sh or shutdown.sh`
+
+- tomcat程序未在运行时，执行`shutdown.sh`会报错
+- tomcat会自动导入jdk
+
+## 11.4 安装IDEA（图形界面）
+
+1. 下载linux安装包
+2. 解压缩到`/opt/idea`
+3. 启动`/opt/idea/bin`目录下的`./idea.sh`，配置jdk
+
+## 11.5 安装mysql
+
+[CentOS7.6安装MYSQL8.0](https://www.cnblogs.com/guarderming/p/11895778.html)
+
