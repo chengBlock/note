@@ -1248,3 +1248,137 @@ java -version
 
 [CentOS7.6安装MYSQL8.0](https://www.cnblogs.com/guarderming/p/11895778.html)
 
+# 12.VM配置虚拟机
+
+## 12.1 CentOS7
+
+## 12.1.1 网络选择
+
+使用NAT模式，虚拟机同样可以与主机通信。此时虚拟机与主机的`VMnet8`处于同一网段中，主机的IP地址为`VMnet8`网卡的IP地址。
+
+**不要将NAT的DHCP修改到与主机同一网段中，这样会与实际网络产生冲突。**
+
+## 12.1.2 CentOS7普通用户添加sudo权限
+
+```bash
+# 1.切换root用户
+su
+
+# 2.修改/etc/sudoers的文件权限
+chmod 640 /etc/sudoers
+
+# 3.添加clcheng的sudoer权限
+## Allow root to run any commands anywhere 
+root	ALL=(ALL) 	ALL
+clcheng	ALL=(ALL) 	ALL
+## nopasswd,如果不想输入密码
+## clcheng ALL=(ALL) NOPASSWD:ALL
+
+# 4.恢复/etc/sudoers的默认权限
+chmod 440 /etc/sudoers
+```
+
+## 12.1.3 CentOS7 共享文件夹
+
+**步骤：**
+
+1. 虚拟机设置共享文件夹
+2. 进入CentOS中自动挂载共享文件夹
+
+
+
+共享文件夹不能使用mount工具挂载，而是得用vmhgfs-fuse，需要使用安装工具包：
+
+```bash
+# 安装vm工具包（CentOS7默认自带）
+# open-vm-tools-devel(centos)、open-vm-dkms(unbuntu)
+yum install open-vm-tools-devel -y
+
+[clcheng@CentOS hgfs]$ which vmhgfs-fuse
+/usr/bin/vmhgfs-fuse
+```
+
+**脚本命令：**
+
+```bash
+# 查看共享目录情况
+[clcheng@CentOS hgfs]$ vmware-hgfsclient
+Share
+
+# 临时生效
+# Share是主机共享的文件名，挂载到/mnt/hgfs上
+vmhgfs-fuse .host:/Share /mnt/hgfs
+
+# 自动挂载
+vim /etc/fstab
+# 添加
+.host:/Share /mnt/hgfs fuse.vmhgfs-fuse allow_other,defaults 0 0
+```
+
+## 12.1.4 linux配置ssh公钥认证
+
+​		如果A主机想免密码登录到B主机上，则A主机上存放私钥，B 主机上存放公钥。通过ssh-keygen 命令生成的两个文件为：公钥文件 ~/.ssh/id_rsa.pub； 私钥文件 ~/.ssh/id_rsa 。
+
+​		【而B主机上存放公钥时，需要将id_rsa.pub的内容存放到~/.ssh/authorized_keys 文件内，并且保证权限为600 。】（可以不使用这种方法）
+
+一、生成和导入KEY
+
+A主机上生成key
+
+```bash
+# -t 指定加密算法
+ssh-keygen -t rsa
+```
+
+- 私钥：id_rsa
+- 公钥：id_rsa.pub
+
+使用ssh-copy-id命令将A主机的公钥自动添加到B主机的`authorized_keys`，且**不需要修改权限**，默认即为600
+
+```bash
+ssh-copy-id -i id_rsa.pub clcheng@远程服务器B的ip
+```
+
+二、配置sshd_config（sshd，服务器端）
+
+配置完key后，B主机需要在`sshd_config`文件中开启key认证
+
+```bash
+vim /etc/ssh/sshd_config
+# 允许ssh公钥认证登录
+RSAAuthentication yes
+PubkeyAuthentication yes
+```
+
+```bash
+# 设置root用户能否通过SSH登录
+PermitRootLogin yes
+# 设置完密钥登录后，可以禁用密码登录
+PasswordAuthentication no
+```
+
+重启sshd，使配置生效
+
+```bash
+systemctl restart sshd
+```
+
+- sshd、mysqld，在这里d是`daemon`的缩写，说明它自己是个**守护进程**，它在后台运行,一般都是用来做服务端程序。
+
+三、ssh_config及多私钥配置（ssh，客户端）
+
+​		当客户机需要连接多个服务器时，私钥管理有两种方案：
+
+1. 在不同的主机上，使用相同的公钥，则这些机器的私钥也相同。客户端上只需要配置这一个私钥就可以登录所有的主机。
+
+2. 不同的主机上使用不同的公钥时， 这时会有多个不同的私钥。这就需要为不同的主机指定不同的私钥文件，这个配置可以在ssh_config中配置（不存在时自己创建）：
+
+   ```bash
+   Host xxxx
+   IdentityFile 私钥文件名
+   Port 端口号
+   User 你登陆xxxx服务器用的账号
+   ```
+
+## 12.2 Windows7
+
