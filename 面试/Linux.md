@@ -1252,13 +1252,13 @@ java -version
 
 ## 12.1 CentOS7
 
-## 12.1.1 网络选择
+### 12.1.1 网络选择
 
 使用NAT模式，虚拟机同样可以与主机通信。此时虚拟机与主机的`VMnet8`处于同一网段中，主机的IP地址为`VMnet8`网卡的IP地址。
 
 **不要将NAT的DHCP修改到与主机同一网段中，这样会与实际网络产生冲突。**
 
-## 12.1.2 CentOS7普通用户添加sudo权限
+### 12.1.2 CentOS7普通用户添加sudo权限
 
 ```bash
 # 1.切换root用户
@@ -1278,7 +1278,7 @@ clcheng	ALL=(ALL) 	ALL
 chmod 440 /etc/sudoers
 ```
 
-## 12.1.3 CentOS7 共享文件夹
+### 12.1.3 CentOS7 共享文件夹
 
 **步骤：**
 
@@ -1315,7 +1315,7 @@ vim /etc/fstab
 .host:/Share /mnt/hgfs fuse.vmhgfs-fuse allow_other,defaults 0 0
 ```
 
-## 12.1.4 linux配置ssh公钥认证
+### 12.1.4 linux配置ssh公钥认证
 
 ​		如果A主机想免密码登录到B主机上，则A主机上存放私钥，B 主机上存放公钥。通过ssh-keygen 命令生成的两个文件为：公钥文件 ~/.ssh/id_rsa.pub； 私钥文件 ~/.ssh/id_rsa 。
 
@@ -1382,3 +1382,12 @@ systemctl restart sshd
 
 ## 12.2 Windows7
 
+## 12.2.1 TMD，Win7可以安装vmtools工具
+
+windows系统在VM中可以通过Vmware直接安装VmTools，但是CentOS上面是灰色的。
+
+![image-20210123233042805](C:\Users\clcheng\AppData\Roaming\Typora\typora-user-images\image-20210123233042805.png)
+
+### 12.2.2 Win7配置共享文件夹
+
+http://www.windows7en.com/jiaocheng/26974.html
