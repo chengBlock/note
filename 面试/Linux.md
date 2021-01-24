@@ -1258,6 +1258,12 @@ java -version
 
 **不要将NAT的DHCP修改到与主机同一网段中，这样会与实际网络产生冲突。**
 
+- 桥接模式：VMnet0
+- 仅主机模式：VMnet1
+- NAT模式：VMnet8
+
+实体机中会出现VMnet1、VMnet8两个虚拟网卡，但是VMnet0直接桥接到物理网卡上，默认不安装独立的网卡。
+
 ### 12.1.2 CentOS7普通用户添加sudo权限
 
 ```bash
