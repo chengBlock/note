@@ -1,3 +1,38 @@
+# Linux常用命令
+
+```bash
+#tar.gz要加z，tar直接使用xvf
+tar zvxf [文件] [目标目录]
+
+# 开机自启
+systemctl enable sshd
+
+# 防火墙
+firewall-cmd --permanent --add-port=port/protocol
+firewall-cmd --permanent --remove-port=port/protocol
+firewall-cmd --reload
+firewall-cmd --query-port=port/protocol
+
+# 查看正在端口状态，a：all、n：显示ip、p：显示对应PID及进程
+netstat -anp
+
+# 显示系统执行的进程，a：all、u：以用户格式显示进程信息、x：显示后台进程运行的参数(程序)
+ps -aux
+
+# 实时显示文本
+tail -f 文本文件
+
+# 分页显示
+more
+
+# 不挂断地运行命令，&：在后台运行
+nohup java hello &
+```
+
+
+
+
+
 # 1 Linux介绍
 
 ## 1.1 Linux内核
@@ -228,7 +263,7 @@ PATH这个目录下放的可执行程序，在系统任何地方都可以直接�
 
 > 主机名配置文件(static)
 >
-> /etc/hostname
+> 可以直接修改/etc/hostname
 
 ```bash
 # 查看主机名配置文件，查看到的是静态的
@@ -1397,3 +1432,674 @@ windows系统在VM中可以通过Vmware直接安装VmTools，但是CentOS上面�
 ### 12.2.2 Win7配置共享文件夹
 
 http://www.windows7en.com/jiaocheng/26974.html
+
+# 13.网络配置
+
+## 13.1 NAT网络配置
+
+![image-20210124101932241](C:\Users\clcheng\AppData\Roaming\Typora\typora-user-images\image-20210124101932241.png)
+
+​		虚拟机Vmware默认使用`Vmnet8`虚拟网卡作为NAT网络地址转换的代理网卡，在逻辑上选择NAT模式的虚拟机会在`Vmnet8`所处的同一个网段中，彼此可以相互通信，并且虚拟机也可以访问`Vmnet8`的IP地址以与实体机通信。
+
+​		NAT与桥接模式的差异在于桥接模式相当于虚拟机直接连接在实体机所在的物理网络中，可以与物理网络中的其他实体机通信。而NAT等同于自建一个独立的局域网，与实体局域网相互独立。
+
+## 13.2 配置静态IP
+
+**编辑：**`/etc/sysconfig/network-scripts/ifcfg-ens33`文件
+
+**重启后生效：**`systemctl restart network`
+
+**注意：**VM的NAT默认网关是2，不是1。1代指实体机
+
+![image-20210124120601152](C:\Users\clcheng\AppData\Roaming\Typora\typora-user-images\image-20210124120601152.png)
+
+
+
+```bash
+[clcheng@CentOS ~]$ cat /etc/sysconfig/network-scripts/ifcfg-ens33
+TYPE=Ethernet				
+PROXY_METHOD=none
+BROWSER_ONLY=no
+# ip的配置方法[none|static|bootp|dhcp](一般使用static or dhcp)
+BOOTPROTO=dhcp			
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+NAME=ens33
+UUID=04b073ea-2bbb-4a15-b53e-1fb4820ef2e3
+# 指定网卡
+DEVICE=ens33
+#设置网卡启动方式为开机启动,并且可以通过系统服务管理器 systemctl 控制网卡
+ONBOOT=yes			 
+```
+
+```bash
+# 当BOOTPROTO设置为static时，需要指定ip配置
+BOOTPROTO=static
+ONBOOT=yes
+IPADDR=192.168.42.100
+NETMASK=255.255.255.0
+GATEWAY=192.168.42.1
+DNS1=192.168.42.1
+DNS2=8.8.8.8
+```
+
+**`network-scripts`中的文件：**
+
+```bash
+[clcheng@CentOS network-scripts]$ ls
+ifcfg-ens33  ifdown-ppp       ifup-ib      ifup-Team
+ifcfg-lo     ifdown-routes    ifup-ippp    ifup-TeamPort
+ifdown       ifdown-sit       ifup-ipv6    ifup-tunnel
+ifdown-bnep  ifdown-Team      ifup-isdn    ifup-wireless
+ifdown-eth   ifdown-TeamPort  ifup-plip    init.ipv6-global
+ifdown-ib    ifdown-tunnel    ifup-plusb   network-functions
+ifdown-ippp  ifup             ifup-post    network-functions-ipv6
+ifdown-ipv6  ifup-aliases     ifup-ppp
+ifdown-isdn  ifup-bnep        ifup-routes
+ifdown-post  ifup-eth         ifup-sit
+```
+
+```bash
+[clcheng@CentOS network-scripts]$ cat ifcfg-lo
+DEVICE=lo
+IPADDR=127.0.0.1
+NETMASK=255.0.0.0
+NETWORK=127.0.0.0
+# If you're having problems with gated making 127.0.0.0/8 a martian,
+# you can change this to something else (255.255.255.255, for example)
+BROADCAST=127.255.255.255
+ONBOOT=yes
+NAME=loopback
+```
+
+## 13.3 设置主机名和hosts映射
+
+### 13.3.1 设置主机名
+
+**查看&修改**`/etc/hostname`文件
+
+重启生效
+
+### 13.3.2 hosts映射
+
+#### 13.3.2.1 windows
+
+直接修改`C:\Windows\System32\drivers\etc\hosts`
+
+```bash
+clcheng@clcheng MINGW64 /c/Windows/System32/drivers/etc
+$ cat hosts
+# Copyright (c) 1993-2009 Microsoft Corp.
+#
+# This is a sample HOSTS file used by Microsoft TCP/IP for Windows.
+#
+# This file contains the mappings of IP addresses to host names. Each
+# entry should be kept on an individual line. The IP address should
+# be placed in the first column followed by the corresponding host name.
+# The IP address and the host name should be separated by at least one
+# space.
+#
+# Additionally, comments (such as these) may be inserted on individual
+# lines or following the machine name denoted by a '#' symbol.
+#
+# For example:
+#
+#      102.54.94.97     rhino.acme.com          # source server
+#       38.25.63.10     x.acme.com              # x client host
+
+# localhost name resolution is handled within DNS itself.
+#       127.0.0.1       localhost
+#       ::1             localhost
+192.168.42.129  centos
+```
+
+```bash
+C:\Users\clcheng>ssh clcheng@centos
+Last login: Sun Jan 24 11:02:24 2021 from 192.168.42.1
+Last login: Sun Jan 24 11:02:24 2021 from 192.168.42.1
+[clcheng@CentOS ~]$
+```
+
+#### 13.3.2.2 linux
+
+在`/etc/hosts`文件中指定
+
+```bash
+[clcheng@CentOS ~]$ cat /etc/hosts
+# 可以一对多、多对多映射
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+```
+
+## 13.4 DNS流程
+
+**浏览器解析流程：**
+
+1. 浏览器缓存
+2. DNS本地缓存
+3. `hosts`文件
+4. DNS服务器解析
+
+```bash
+# DNS本地缓存
+ipconfig /displaydns
+# 清理DNS缓存
+ipconfig /flushdns
+```
+
+```bash
+www.baidu.com
+    ----------------------------------------
+    记录名称. . . . . . . : www.baidu.com
+    记录类型. . . . . . . : 5
+    生存时间. . . . . . . : 69
+    数据长度. . . . . . . : 8
+    部分. . . . . . . . . : 答案
+    CNAME 记录  . . . . . : www.a.shifen.com
+
+
+    记录名称. . . . . . . : www.a.shifen.com
+    记录类型. . . . . . . : 1
+    生存时间. . . . . . . : 69
+    数据长度. . . . . . . : 4
+    部分. . . . . . . . . : 答案
+    A (主机)记录  . . . . : 36.152.44.96
+
+
+    记录名称. . . . . . . : www.a.shifen.com
+    记录类型. . . . . . . : 1
+    生存时间. . . . . . . : 69
+    数据长度. . . . . . . : 4
+    部分. . . . . . . . . : 答案
+    A (主机)记录  . . . . : 36.152.44.95
+```
+
+## 13.5 ARP命令
+
+```bash
+# 查看缓存（win -a & linux -g）
+arp -a
+# 查看指定网卡的arp缓存
+arp -a [IP]
+# 手动添加
+arp -s [IP] [MAC]
+# 清空缓存
+arp -d
+arp -d [IP]
+```
+
+## 13.6 netstat命令
+
+​		在Internet RFC标准中，Netstat的定义是： Netstat是在内核中访问网络及相关信息的程序，它能提供TCP连接，TCP和UDP监听，进程内存管理的相关报告。
+
+​		netstat命令的功能是显示网络连接、路由表和网络接口信息，可以让用户得知有哪些网络连接正在运作。使用时如果不带参数，netstat显示活动的 TCP 连接。
+
+**该命令的一般格式：**
+
+`netstat [-a][-e][-n][-o][-p Protocol][-r][-s][Interval]`
+
+
+
+`netstat -anp`
+
+**interval:**
+
+​		 重新显示选定的统计，各个显示间暂停的 间隔秒数。按 CTRL+C 停止重新显示统计。如果省略，则 netstat 将打印当前的配置信息一次。
+
+**选项:**
+
+```bash
+   -a 显示所有socket，包括正在监听的。
+
+　　-c 每隔1秒就重新显示一遍，直到用户中断它。
+
+　　-i 显示所有网络接口的信息，格式“netstat -i”。
+
+　　-n 以网络IP地址代替名称，显示出网络连接情形。
+
+　　-r显示核心路由表，格式同“route -e”。
+
+　　-t 显示TCP协议的连接情况
+
+　　-u 显示UDP协议的连接情况。
+
+　　-v 显示正在进行的工作。
+
+　　-p 显示建立相关连接的程序名和PID。
+
+　　-b 显示在创建每个连接或侦听端口时涉及的可执行程序。
+
+　　-e 显示以太网统计。此选项可以与 -s 选项结合使用。
+
+　　-f 显示外部地址的完全限定域名(FQDN)。
+
+　　-o显示与每个连接相关的所属进程 ID。
+　　
+　　-s 显示每个协议的统计。
+
+　　-x 显示 NetworkDirect 连接、侦听器和共享端点。
+
+　　-y 显示所有连接的 TCP 连接模板。无法与其他选项结合使用。
+```
+
+## 13.7 telnet
+
+​		`telnet`为用户提供了在本地计算机上完成远程主机工作的能力。终端使用者可以在telnet程序中输入命令，这些命令会在服务器上运行，就像直接在服务器的控制台上输入一样。
+
+​		输入q或quit退出telnet程序。
+
+一、测试端口开启状态
+
+```bash
+telnet [remote_host] [remote_pore]
+```
+
+
+
+# 14.Ubuntu配置
+
+## 14.1 Ubuntu的root用户		
+
+安装ubuntu成功后，都是普通用户权限，并没有最高root权限，如果需要使用root权限的时候，通常都会在命令前面加上sudo。
+
+​		如果未给root设置初始密码，就会抛出`su:Authentication failure`的问题。此时只需给root用户设置一个初始密码就好了。
+
+```bash
+sudo passwd
+```
+
+## 14.2 APT介绍
+
+​		Advanced Packaging Tool的简称，又名apt-get，是一款Debian下的安装包管理工具。经过修改后可以使用apt-rpm处理红帽的Package Manager（RPM）文件。
+
+### 14.2.1 换源
+
+**清华大学开源软件镜像站：**定时从外网更新下载
+
+https://mirrors.tuna.tsinghua.edu.cn/
+
+`/etc/apt/source.list`
+
+![image-20210124163624534](C:\Users\clcheng\AppData\Roaming\Typora\typora-user-images\image-20210124163624534.png)
+
+![image-20210124163638541](C:\Users\clcheng\AppData\Roaming\Typora\typora-user-images\image-20210124163638541.png)
+
+### 14.2.2 常用apt
+
+```bash
+# 确保软件包列表是最新的，与源版本一致
+apt-get update
+
+# 更新软件包
+apt-get upgrade
+
+# 系统升级到新版本
+apt-get dist-upgrade
+
+# 安装
+apt-get install packagename
+
+# 卸载（保留配置文档）
+apt-get remove packagename
+
+# 卸载（删除配置文档）
+apt-get purge packagename
+apt-get remove --purge packagename
+
+# apt会把已装或已卸的软件都备份在硬盘上
+# 删除已卸载掉的软件的备份
+apt-get autoclean
+
+# 删除已安装的软件的备份（不影响使用）
+apt-get clean
+
+# 显示软件包信息
+apt-cache show packagename
+
+# 查看文件属于哪个已安装的软件包
+dpkg -S file
+```
+
+## 14.3 SSH
+
+​		Ubuntu默认不安装ssh
+
+- 安装ssh
+
+  ```bash
+  # 客户端（ssh）和服务端（sshd）同时安装
+  apt-get install openssh-server
+  ```
+
+- 启动sshd服务
+
+  ```bash
+  systemctl restart sshd
+  
+  # 开机自启动
+  systemctl enable sshd
+  ```
+
+# 15.树莓派
+
+​		树莓派的操作系统镜像基于Debian arm64 构建的。同时，现在开始，32 位和 64 位操作系统镜像都不再使用“Raspbian”这一名称，改用新的统一的名称：Raspberry Pi OS，这样更便于用户识记。
+
+**Raspberry Pi OS发展：**
+
+Jessie -> Stretch -> Buster
+
+**CPU架构:**
+
+- arm64：64位
+- armhf：32位
+
+**系统源：**`/etc/apt/sources.list`
+
+**软件源：**`/etc/apt/sources.list.d/raspi.list`
+
+## 15.1 64位系统配置（arm64版本）
+
+64位镜像可以直接使用debian的系统源，首先需要编辑`/etc/apt/sources.list`，使用`#`号注释原内容，然后在末尾添加Debian的系统源：
+
+```shell
+# 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster main contrib non-free
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ buster main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-updates main contrib non-free
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-updates main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-backports main contrib non-free
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-backports main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian-security buster/updates main contrib non-free
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian-security buster/updates main contrib non-free
+123456789
+```
+
+接着需要配置树莓派官方的软件源，编辑`/etc/apt/sources.list.d/raspi.list`，同样的，注释原内容，在末尾添加如下内容：
+
+```shell
+deb http://mirrors.tuna.tsinghua.edu.cn/raspberrypi/ buster main ui
+1
+```
+
+## 15.2 32位系统配置（armhf版本）
+
+两者配置方法一致，都是修改上述两个文件（**64位系统也可以下述系统源**），具体如下：
+
+编辑 `/etc/apt/sources.list` 文件，注释原文件内容，用以下内容取代：
+
+```
+deb http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian/ buster main non-free contrib rpi
+deb-src http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian/ buster main non-free contrib rpi
+12
+```
+
+编辑 `/etc/apt/sources.list.d/raspi.list` 文件，注释原文件内容，用以下内容取代：
+
+```shell
+deb http://mirrors.tuna.tsinghua.edu.cn/raspberrypi/ buster main ui
+```
+
+# 16.服务（service）管理
+
+​		服务（service）本质就是进程，特指运行在后台的守护进程（daemon），通常都会监听某个端口，等待其他程序的请求。比如，mysqld、sshd、防火墙等。
+
+​		在CentOS7以前很多服务使用service（/etc/init.d）进行管理，CentOS7以后使用systemctl管理。
+
+## 16.1 systemctl详细介绍
+
+​		 systemd是Linux系统最新的初始化系统(init)，作用是提高系统的启动速度，尽可能启动较少的进程，尽可能更多进程并发启动。systemd对应的进程管理命令是systemctl。
+
+​		systemd的进程号为1：
+
+```bash
+UID        PID  PPID  C STIME TTY          TIME CMD
+root         1     0  0 1月23 ?       00:00:34 /usr/lib/systemd/systemd --switched-root --system --deserialize 22
+```
+
+​		systemctl命令兼容了service命令，即systemctl也会去/etc/init.d目录下查看执行相关程序。
+
+​		systemctl提供了一组子命令来管理单个unit（服务），unit主要有四种类型文件：
+
+- .mount
+- .service
+- .target
+- .wants
+
+## 16.2 systemctl常用命令
+
+​		systemctl 提供了一组子命令来管理单个的 unit，其命令格式为：`systemctl [command] [unit]`。systemctl指令管理的服务在`/usr/lib/systemd/system`文件下查看。
+
+**基本语法:**
+
+systemcl [start|stop|restart|status] 服务名
+
+**举例：**
+
+systemctl start firewalld  # 启动防火墙
+
+```bash
+# 启动
+start
+# 关闭
+stop
+# 重启
+restart
+# 重载
+restart
+# 开机自启
+enable
+# 取消开机自启
+disable
+# 状态
+status
+# 详细配置信息
+show
+# 注销，之后就无法启动该unit
+mask
+# 取消注销
+unmask
+
+# 列出所有系统服务的启动状态
+systemctl list-unit-files
+# 是否运行
+is-active
+# 是否自启
+is-enabled
+```
+
+## 16.3 服务运行级别
+
+0，1，2，3，4，5，6
+
+**开机流程说明:**
+
+开机->BIOS->/boot->sytemd进程1->运行级别->运行级别对应的服务
+
+## 16.4 firewall指令
+
+配合使用`netstat -anp`查看进程的`port/protocol`
+
+```bash
+# 打开端口
+firewall-cmd --permanent --add-port=port/protocol
+# 关闭端口
+firewall-cmd --permanent --remove-port=port/protocol
+# 重载，每次修改策略都需重载
+firewall-cmd --reload
+# 查询端口开发情况
+firewall-cmd --query-port=port/protocol
+```
+
+# 17.进程
+
+**根据端口号找进程，并结束进程:**
+
+1. netstat -anp | grep port
+2. kill -9 PID
+
+## 17.1 基本介绍
+
+​		在Linux中，每个执行的程序都称为一个进程，每个进程都分配一个ID号（pid）。
+
+​		每个进程都可以以**前台**或**后台**的方式存在，一般系统的服务都是在以后台进程的方式存在，而且会常驻在系统中，直到关机才结束。
+
+```bash
+# 输出重定向到当前目录下的nohup.out中
+nohup [command] &
+```
+
+## 17.2 显示系统执行的进程
+
+`ps`命令是用来查看目前系统中进程的执行状况
+
+| 字段  |                             说明                             |
+| :---: | :----------------------------------------------------------: |
+| USER  |                        进程的执行用户                        |
+|  PID  |                          进程标识号                          |
+|  VSZ  |                    虚拟内存使用情况（KB）                    |
+|  RSS  |                  实际物理内存使用情况（KB）                  |
+|  TTY  |                        终端名称(缩写)                        |
+| STAT  | 当前程序的状态：S-Sleep、s-会话的先导进程、R-Run、Z-僵死进程（未释放内存）、T-停止 |
+| START |                        执行的开始时间                        |
+| TIME  |                         占用CPU时间                          |
+|  CMD  |                    正在执行的命令或进程名                    |
+
+![image-20210125221912579](C:\Users\clcheng\AppData\Roaming\Typora\typora-user-images\image-20210125221912579.png)
+
+`ps`的参数：
+
+| 参数 |            说明            |
+| :--: | :------------------------: |
+|  a   | 显示当前终端的所有进程信息 |
+|  u   |   以用户格式显示进程信息   |
+|  x   |   显示后台程序运行的参数   |
+
+- ps -aux：显示所有进程
+
+**全格式显示当前所有进程：**
+
+- 查看父进程（PPID）
+- BSD风格
+
+
+
+![image-20210125223504480](C:\Users\clcheng\AppData\Roaming\Typora\typora-user-images\image-20210125223504480.png)
+
+## 17.3 终止进程
+
+- 基本语法
+  - kill [选项] PID	(通过进程号杀死进程)
+  - killall 进程名称    (通过进程名称杀死进程，可使用通配符)
+- 常用选项
+  - -9：强制结束进程
+  - killall：会杀死子进程，杀死同进程名称的多个进程
+
+## 17.4 pstree
+
+**基本语法:**
+
+pstree [选项] 可以更直观的来查看进程信息
+
+**常用选项：**
+
+- -p：显示进程的PID
+- -u：显示进程的所属用户
+
+# 18.系统监控
+
+## 18.1 网络监控
+
+```bash
+[root@CentOS Java]# netstat -an
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN
+tcp        0      0 0.0.0.0:23              0.0.0.0:*               LISTEN
+tcp        0     36 172.17.212.49:22        39.180.60.172:5602      ESTABLISHED
+tcp        0      0 172.17.212.49:57316     100.100.30.26:80        ESTABLISHED
+tcp6       0      0 :::33060                :::*                    LISTEN
+tcp6       0      0 :::3306                 :::*                    LISTEN
+udp        0      0 127.0.0.1:323           0.0.0.0:*
+udp        0      0 0.0.0.0:68              0.0.0.0:*
+udp6       0      0 ::1:323                 :::*
+Active UNIX domain sockets (servers and established)
+Proto RefCnt Flags       Type       State         I-Node   Path
+unix  4      [ ]         DGRAM                    7433     /run/systemd/notify
+unix  2      [ ]         DGRAM                    7435     /run/systemd/cgroups-agent
+unix  2      [ ACC ]     STREAM     LISTENING     7443     /run/systemd/journal/stdout
+unix  2      [ ]         DGRAM                    13333    /var/run/chrony/chronyd.sock
+unix  2      [ ACC ]     STREAM     LISTENING     10261    /run/systemd/private
+unix  5      [ ]         DGRAM                    7446     /run/systemd/journal/socket
+unix  11     [ ]         DGRAM                    7448     /dev/log
+unix  2      [ ACC ]     SEQPACKET  LISTENING     10277    /run/udev/control
+unix  2      [ ]         DGRAM                    10279    /run/systemd/shutdownd
+unix  2      [ ACC ]     STREAM     LISTENING     16348    /var/lib/mysql/mysql.sock
+unix  2      [ ACC ]     STREAM     LISTENING     12144    /run/dbus/system_bus_socket
+unix  2      [ ACC ]     STREAM     LISTENING     10425    /run/lvm/lvmpolld.socket
+unix  2      [ ACC ]     STREAM     LISTENING     10442    /run/lvm/lvmetad.socket
+unix  2      [ ACC ]     STREAM     LISTENING     16344    /var/run/mysqld/mysqlx.sock
+```
+
+一、`Active Internet connections (servers and established)`
+
+
+
+二、`Active UNIX domain sockets (servers and established)`
+
+​		socket API原本是为网络通讯设计的，但后来在socket的框架上发展出一种IPC机制，就是`UNIX Domain Socket`。虽然网络socket也可用于同一台主机的进程间通讯（通过loopback地址127.0.0.1），但是UNIX Domain Socket用于IPC更有效率：不需要经过网络协议栈，不需要打包拆包、计算校验和、维护序号和应答等，只是将应用层数据从一个进程拷贝到另一个进程。这是因为，IPC机制本质上是可靠的通讯，而网络协议是为不可靠的通讯设计的。UNIX Domain Socket也提供面向流和面向数据包两种API接口，类似于TCP和UDP，但是面向消息的UNIX Domain Socket也是可靠的，消息既不会丢失也不会顺序错乱。
+
+​		UNIX Domain Socket是全双工的，API接口语义丰富，相比其它IPC机制有明显的优越性，目前已成为使用最广泛的IPC机制，比如X Window服务器和GUI程序之间就是通过UNIX Domain Socket通讯的。
+
+​		使用UNIX Domain Socket的过程和网络socket十分相似，也要先调用socket()创建一个socket文件描述符，address family指定为AF_UNIX，type可以选择SOCK_DGRAM或SOCK_STREAM，protocol参数仍然指定为0即可。
+
+​		UNIX Domain Socket与网络socket编程最明显的不同在于地址格式不同，用结构体sockaddr_un表示，网络编程的socket地址是IP地址加端口号，而UNIX Domain Socket的地址是一个socket类型的文件在文件系统中的路径，这个socket文件由bind()调用创建，如果调用bind()时该文件已存在，则bind()错误返回。
+
+三、IPC
+
+​		进程间通信
+
+## 18.2 TCP连接状态
+
+|    状态     |                        说明                        |
+| :---------: | :------------------------------------------------: |
+|   LISTEN    |                        监听                        |
+| ESTABLISHED |                      建立连接                      |
+|  TIME-WAIT  | 超时等待（可能是网络延时造成的问题，先不释放内存） |
+
+## 18.3 Telnet & PING
+
+# 19.动态监控
+
+## 19.1 top
+
+​		top与ps命令相似都是用来显示正在执行的进程，top的优势就是可以
+
+实时更新正在运行的进程。
+
+**基本语法:**
+
+top [选项]
+
+**选项说明:**
+
+|  选项   |             说明              |
+| :-----: | :---------------------------: |
+| -d 秒数 | 指定每隔几秒刷新更新，默认3秒 |
+|   -i    |  不显示任何闲置或僵死的进程   |
+|   -p    |            指定pid            |
+
+**交互操作：**
+
+| 操作 |      功能      |
+| :--: | :------------: |
+|  P   | CPU使用率排序  |
+|  M   | 内存使用率排序 |
+|  N   |    PID排序     |
+|  q   |      退出      |
+

