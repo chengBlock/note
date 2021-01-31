@@ -1,0 +1,29 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
+        mavenCentral()
+        jcenter(){ url 'https://jcenter.bintray.com/'}
+        maven { url 'https://jitpack.io' }
+        google()
+    }
+    dependencies {
+        classpath 'me.champeau.gradle:jmh-gradle-plugin:0.5.2'
+    }
+}
+
+apply plugin: 'com.mindviewinc.example-output-verification'
+
+subprojects {
+    apply from: "$rootProject.projectDir/gradle/java.gradle"
+    apply from: "$rootProject.projectDir/gradle/junit-jupiter.gradle"
+    apply from: "$rootProject.projectDir/gradle/jmh.gradle"
+    // apply from: "$rootProject.projectDir/gradle/checkstyle.gradle"
+    apply from: "$rootProject.projectDir/gradle/findbugs.gradle"
+    apply plugin: 'com.mindviewinc.tagging'
+}
+
+apply from: 'gradle/subprojects.gradle'

@@ -1806,25 +1806,7 @@ Jessie -> Stretch -> Buster
 
 64位镜像可以直接使用debian的系统源，首先需要编辑`/etc/apt/sources.list`，使用`#`号注释原内容，然后在末尾添加Debian的系统源：
 
-```shell
-# 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
-deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster main contrib non-free
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ buster main contrib non-free
-deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-updates main contrib non-free
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-updates main contrib non-free
-deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-backports main contrib non-free
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-backports main contrib non-free
-deb https://mirrors.tuna.tsinghua.edu.cn/debian-security buster/updates main contrib non-free
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian-security buster/updates main contrib non-free
-123456789
-```
-
-接着需要配置树莓派官方的软件源，编辑`/etc/apt/sources.list.d/raspi.list`，同样的，注释原内容，在末尾添加如下内容：
-
-```shell
-deb http://mirrors.tuna.tsinghua.edu.cn/raspberrypi/ buster main ui
-1
-```
+https://mirrors.tuna.tsinghua.edu.cn/help/raspbian/
 
 ## 15.2 32位系统配置（armhf版本）
 
